@@ -1,6 +1,6 @@
 function SectionTitle({ eyebrow, title, inverse = false }) {
-  const eyebrowClass = inverse ? 'text-brand-100' : 'text-brand-500'
-  const titleClass = inverse ? 'text-white' : 'text-slate-900'
+  const eyebrowClass = inverse ? 'text-brand-100' : 'text-brand-500 dark:text-brand-100'
+  const titleClass = inverse ? 'text-white' : 'text-slate-900 dark:text-white'
 
   return (
     <div className="mb-8">
