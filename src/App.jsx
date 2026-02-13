@@ -38,6 +38,7 @@ function VoguzPreview() {
 function App() {
   const [theme, setTheme] = useState('light')
   const [selectedMarks, setSelectedMarks] = useState(null)
+  const coreStack = ['HTML', 'CSS', 'Tailwind CSS', 'JavaScript', 'React', 'PHP', 'Kotlin', 'MySQL']
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme')
@@ -96,7 +97,19 @@ function App() {
 
       <header className="relative z-10 mx-auto max-w-5xl px-6 pb-20 pt-16">
         <nav className="mb-12 flex flex-wrap items-center justify-between gap-4">
-          <span className="text-lg font-bold text-brand-900 dark:text-brand-100">Aung Khant Min</span>
+          <div className="rounded-2xl border border-white/60 bg-white/70 px-3 py-2 shadow-lg shadow-brand-500/10 backdrop-blur dark:border-slate-700 dark:bg-slate-900/70">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-sm font-extrabold text-white dark:bg-brand-500">
+                AK
+              </span>
+              <div>
+                <p className="text-lg font-black tracking-tight text-slate-900 dark:text-white">Aung Khant Min</p>
+                <div className="mt-0.5 inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-200">
+                  Full Stack Developer
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="flex items-center gap-6 text-sm font-medium text-slate-700 dark:text-slate-200">
             <a href="#about" className="hover:text-brand-600 dark:hover:text-brand-100">
               About
@@ -122,13 +135,23 @@ function App() {
 
         <div className="grid gap-12 md:grid-cols-[1.3fr_1fr] md:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-500 dark:text-brand-100">Frontend Developer</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-500 dark:text-brand-100">Full Stack Developer</p>
             <h1 className="mt-4 text-4xl font-extrabold leading-tight text-slate-900 dark:text-white md:text-6xl">
-              I am Aung Khant Min, and I build fast modern web interfaces.
+              Hi, I&apos;m Aung Khant Min.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-slate-600 dark:text-slate-300">
-              I craft user-friendly products with React and Tailwind CSS, focused on clean design and performance.
+              I build clean and scalable web applications, from frontend interfaces to backend logic.
             </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {coreStack.map((tech) => (
+                <span
+                  key={tech}
+                  className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 dark:bg-slate-900 dark:text-slate-200 dark:ring-slate-700"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
             <div className="mt-8 flex gap-4">
               <a
                 href="#projects"
@@ -151,11 +174,11 @@ function App() {
               className="h-80 w-full rounded-2xl object-cover object-[center_25%] ring-1 ring-slate-200 dark:ring-slate-700"
             />
             <p className="mt-4 text-lg font-bold text-slate-900 dark:text-white">Aung Khant Min</p>
-            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Frontend Developer</p>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Full Stack Developer</p>
             <ul className="mt-4 space-y-2 text-sm text-slate-700 dark:text-slate-200">
-              <li>React</li>
-              <li>JavaScript (ES6+)</li>
-              <li>Tailwind CSS</li>
+              <li>HTML | CSS | Tailwind CSS</li>
+              <li>JavaScript | React</li>
+              <li>PHP | Kotlin | MySQL</li>
             </ul>
           </div>
         </div>
@@ -165,8 +188,9 @@ function App() {
         <section id="about">
           <SectionTitle eyebrow="About" title="A quick introduction" />
           <p className="max-w-3xl text-slate-700 dark:text-slate-300">
-            I am a developer who enjoys turning ideas into polished, scalable web apps. I focus on readable code,
-            responsive layouts, and smooth user experiences.
+            I am a Full Stack Developer who enjoys turning ideas into polished, scalable web apps. I work with HTML,
+            CSS, Tailwind CSS, JavaScript, React, PHP, Kotlin, and MySQL to build smooth user experiences and reliable
+            backend systems.
           </p>
         </section>
 
