@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import SectionTitle from './components/SectionTitle'
 import projects from './data/projects'
 
@@ -28,7 +28,7 @@ function VoguzPreview() {
         <div className="absolute left-44 -top-4 h-56 w-10 rotate-12 bg-amber-800/80" />
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/30 px-4 text-center">
           <h4 className="text-lg font-extrabold text-white">VOGUZ STYLING</h4>
-          <p className="mt-1 text-xs text-slate-100">Elevate your wardrobe with premium men&apos;s collection</p>
+          <p className="mt-1 text-xs text-slate-100">Elevate your wardrobe with premium men's collection</p>
         </div>
       </div>
     </div>
@@ -37,6 +37,7 @@ function VoguzPreview() {
 
 function App() {
   const [theme, setTheme] = useState('light')
+  const [selectedMarks, setSelectedMarks] = useState(null)
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme')
@@ -54,6 +55,36 @@ function App() {
     localStorage.setItem('theme', theme)
   }, [theme])
 
+  useEffect(() => {
+    document.body.style.overflow = selectedMarks ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [selectedMarks])
+
+  const educationTimeline = [
+    {
+      status: 'Completed',
+      period: 'Foundation Stage',
+      title: 'NCC Level 4 Diploma in Computing',
+      detail: 'Built core knowledge in programming, databases, system analysis, and software development practices.',
+      marksImagePath: '/images/l4 marks.png',
+    },
+    {
+      status: 'Completed',
+      period: 'Advanced Diploma Stage',
+      title: 'NCC Level 5 Diploma in Computing',
+      detail: 'Strengthened practical skills in project work, architecture, and applied computing concepts.',
+      marksImagePath: '/images/l5 marks.jpg',
+    },
+    {
+      status: 'Currently Attending',
+      period: 'Final Year',
+      title: 'B.Sc (Hons) Computing Science, University of Greenwich (UK)',
+      detail: 'Completing final-year studies with focus on advanced computing topics and real-world development.',
+    },
+  ]
+
   return (
     <div className="portfolio-bg relative min-h-screen overflow-hidden bg-gradient-to-b from-brand-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       <div className="pointer-events-none absolute inset-0 -z-0">
@@ -65,10 +96,13 @@ function App() {
 
       <header className="relative z-10 mx-auto max-w-5xl px-6 pb-20 pt-16">
         <nav className="mb-12 flex flex-wrap items-center justify-between gap-4">
-          <span className="text-lg font-bold text-brand-900 dark:text-brand-100">YourName</span>
+          <span className="text-lg font-bold text-brand-900 dark:text-brand-100">Aung Khant Min</span>
           <div className="flex items-center gap-6 text-sm font-medium text-slate-700 dark:text-slate-200">
             <a href="#about" className="hover:text-brand-600 dark:hover:text-brand-100">
               About
+            </a>
+            <a href="#education" className="hover:text-brand-600 dark:hover:text-brand-100">
+              Education
             </a>
             <a href="#projects" className="hover:text-brand-600 dark:hover:text-brand-100">
               Projects
@@ -88,11 +122,9 @@ function App() {
 
         <div className="grid gap-12 md:grid-cols-[1.3fr_1fr] md:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-500 dark:text-brand-100">
-              Frontend Developer
-            </p>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-500 dark:text-brand-100">Frontend Developer</p>
             <h1 className="mt-4 text-4xl font-extrabold leading-tight text-slate-900 dark:text-white md:text-6xl">
-              I build fast and modern web interfaces.
+              I am Aung Khant Min, and I build fast modern web interfaces.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-slate-600 dark:text-slate-300">
               I craft user-friendly products with React and Tailwind CSS, focused on clean design and performance.
@@ -113,12 +145,17 @@ function App() {
             </div>
           </div>
           <div className="rounded-3xl bg-white p-6 shadow-xl ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700">
-            <p className="text-sm font-semibold text-brand-500 dark:text-brand-100">Tech Stack</p>
-            <ul className="mt-4 space-y-3 text-slate-700 dark:text-slate-200">
+            <img
+              src="/images/profile.jpg"
+              alt="Aung Khant Min profile"
+              className="h-80 w-full rounded-2xl object-cover object-[center_25%] ring-1 ring-slate-200 dark:ring-slate-700"
+            />
+            <p className="mt-4 text-lg font-bold text-slate-900 dark:text-white">Aung Khant Min</p>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Frontend Developer</p>
+            <ul className="mt-4 space-y-2 text-sm text-slate-700 dark:text-slate-200">
               <li>React</li>
               <li>JavaScript (ES6+)</li>
               <li>Tailwind CSS</li>
-              <li>REST API Integration</li>
             </ul>
           </div>
         </div>
@@ -131,6 +168,48 @@ function App() {
             I am a developer who enjoys turning ideas into polished, scalable web apps. I focus on readable code,
             responsive layouts, and smooth user experiences.
           </p>
+        </section>
+
+        <section id="education">
+          <SectionTitle eyebrow="Education" title="Academic background" />
+          <div className="relative space-y-8 pl-8">
+            <div className="absolute bottom-3 left-[11px] top-3 w-0.5 bg-gradient-to-b from-brand-300 via-brand-500 to-brand-700 dark:from-brand-800 dark:via-brand-600 dark:to-brand-300" />
+            {educationTimeline.map((item) => (
+              <article
+                key={item.title}
+                className="relative rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700"
+              >
+                <span className="absolute -left-[30px] top-7 h-4 w-4 rounded-full border-4 border-white bg-brand-500 shadow ring-2 ring-brand-200 dark:border-slate-900 dark:ring-brand-900" />
+                <div className="flex flex-wrap items-center gap-3">
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      item.status === 'Currently Attending'
+                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-200'
+                        : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-200'
+                    }`}
+                  >
+                    {item.status}
+                  </span>
+                  <span className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-500 dark:text-brand-100">
+                    {item.period}
+                  </span>
+                </div>
+                <h3 className="mt-3 text-xl font-bold text-slate-900 dark:text-white">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{item.detail}</p>
+                {item.marksImagePath ? (
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMarks({ title: item.title, imagePath: item.marksImagePath })}
+                      className="rounded-full bg-brand-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-brand-600"
+                    >
+                      View Marks
+                    </button>
+                  </div>
+                ) : null}
+              </article>
+            ))}
+          </div>
         </section>
 
         <section id="projects">
@@ -176,11 +255,7 @@ function App() {
           <p className="max-w-2xl text-brand-100">
             Looking for a frontend developer for your next project? Send a message and tell me about your goals.
           </p>
-          <form
-            action="https://formsubmit.co/akmdaniel2@gmail.com"
-            method="POST"
-            className="mt-8 grid gap-4 md:grid-cols-2"
-          >
+          <form action="https://formsubmit.co/akmdaniel2@gmail.com" method="POST" className="mt-8 grid gap-4 md:grid-cols-2">
             <input type="hidden" name="_subject" value="New Portfolio Contact Message" />
             <input type="hidden" name="_template" value="table" />
             <input type="hidden" name="_next" value="https://formsubmit.co/thanks" />
@@ -238,6 +313,27 @@ function App() {
           </form>
         </section>
       </main>
+
+      {selectedMarks ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4" onClick={() => setSelectedMarks(null)}>
+          <div
+            className="w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-900"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-700">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{selectedMarks.title}</h3>
+              <button
+                type="button"
+                onClick={() => setSelectedMarks(null)}
+                className="rounded-full border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700 hover:border-brand-500 hover:text-brand-600 dark:border-slate-600 dark:text-slate-200"
+              >
+                Close
+              </button>
+            </div>
+            <img src={selectedMarks.imagePath} alt={`${selectedMarks.title} marks`} className="max-h-[75vh] w-full object-contain bg-slate-100 dark:bg-slate-950" />
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }
