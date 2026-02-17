@@ -1,6 +1,6 @@
 ﻿import { useEffect, useRef, useState } from 'react'
 import { FaCss3Alt, FaFacebookF, FaGithub, FaHtml5, FaInstagram, FaLinkedinIn, FaPhp, FaReact } from 'react-icons/fa'
-import { SiJavascript, SiKotlin, SiMysql, SiTailwindcss } from 'react-icons/si'
+import { SiJavascript, SiKotlin, SiLaravel, SiMysql, SiTailwindcss } from 'react-icons/si'
 import SectionTitle from './components/SectionTitle'
 import projects from './data/projects'
 
@@ -100,6 +100,7 @@ function App() {
     { name: 'JavaScript', Icon: SiJavascript, iconClass: 'text-yellow-400' },
     { name: 'React', Icon: FaReact, iconClass: 'text-sky-500' },
     { name: 'PHP', Icon: FaPhp, iconClass: 'text-indigo-500' },
+    { name: 'Laravel', Icon: SiLaravel, iconClass: 'text-red-500' },
     { name: 'Kotlin', Icon: SiKotlin, iconClass: 'text-violet-500' },
     { name: 'MySQL', Icon: SiMysql, iconClass: 'text-blue-600' },
   ]
@@ -324,7 +325,7 @@ function App() {
         <section id="about">
           <SectionTitle eyebrow="About" title="A quick introduction" />
           <RevealText
-            text="I am a Full Stack Developer who enjoys turning ideas into polished, scalable web apps. I work with HTML, CSS, Tailwind CSS, JavaScript, React, PHP, Kotlin, and MySQL to build smooth user experiences and reliable backend systems."
+            text="I am a Full Stack Developer who enjoys turning ideas into polished, scalable web apps. I work with HTML, CSS, Tailwind CSS, JavaScript, React, PHP, Laravel, Kotlin, and MySQL to build smooth user experiences and reliable backend systems."
             className="max-w-3xl text-slate-700 dark:text-slate-300"
             step={12}
           />
