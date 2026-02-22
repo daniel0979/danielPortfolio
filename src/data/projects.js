@@ -16,6 +16,14 @@ const projects = [
     githubUrl: 'https://github.com/daniel0979/library',
   },
   {
+    name: 'Laplace Barber Shop',
+    description:
+      'Barber shop web application with a clean booking-focused interface and practical full-stack implementation for service-based business workflows.',
+    stack: ['Laravel', 'JavaScript', 'Tailwind CSS'],
+    imagePath: '/images/barber.png',
+    githubUrl: 'https://github.com/daniel0979/barber',
+  },
+  {
     name: 'RCC Camp Web',
     description:
       'My first project: a retail website focused on core frontend structure, product presentation, and clean page layout.',
