@@ -90,9 +90,21 @@ function App() {
   const [theme, setTheme] = useState('light')
   const [selectedMarks, setSelectedMarks] = useState(null)
   const [activeProject, setActiveProject] = useState(0)
+  const [isProjectSliderHovered, setIsProjectSliderHovered] = useState(false)
+  const [isDraggingProjectSlider, setIsDraggingProjectSlider] = useState(false)
+  const [projectDragOffset, setProjectDragOffset] = useState(0)
   const [showContactForm, setShowContactForm] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
+  const projectSliderViewportRef = useRef(null)
+  const projectSliderDragStateRef = useRef({
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    deltaX: 0,
+    width: 0,
+    isHorizontalDrag: false,
+  })
   const coreStack = [
     { name: 'HTML', Icon: FaHtml5, iconClass: 'text-orange-500' },
     { name: 'CSS', Icon: FaCss3Alt, iconClass: 'text-blue-500' },
@@ -129,12 +141,14 @@ function App() {
   }, [selectedMarks])
 
   useEffect(() => {
+    if (projects.length < 2 || isProjectSliderHovered || isDraggingProjectSlider) return
+
     const slider = setInterval(() => {
       setActiveProject((current) => (current + 1) % projects.length)
-    }, 5000)
+    }, 8000)
 
     return () => clearInterval(slider)
-  }, [])
+  }, [isProjectSliderHovered, isDraggingProjectSlider])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -172,6 +186,90 @@ function App() {
       detail: 'Completing final-year studies with focus on advanced computing topics and real-world development.',
     },
   ]
+
+  const goToPreviousProject = () => {
+    setActiveProject((current) => (current - 1 + projects.length) % projects.length)
+  }
+
+  const goToNextProject = () => {
+    setActiveProject((current) => (current + 1) % projects.length)
+  }
+
+  const resetProjectSliderDrag = () => {
+    projectSliderDragStateRef.current = {
+      pointerId: null,
+      startX: 0,
+      startY: 0,
+      deltaX: 0,
+      width: 0,
+      isHorizontalDrag: false,
+    }
+    setProjectDragOffset(0)
+    setIsDraggingProjectSlider(false)
+  }
+
+  const handleProjectSliderPointerDown = (event) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return
+
+    const viewport = projectSliderViewportRef.current
+    if (!viewport) return
+
+    projectSliderDragStateRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      deltaX: 0,
+      width: viewport.clientWidth,
+      isHorizontalDrag: false,
+    }
+    event.currentTarget.setPointerCapture(event.pointerId)
+    setIsDraggingProjectSlider(true)
+  }
+
+  const handleProjectSliderPointerMove = (event) => {
+    const dragState = projectSliderDragStateRef.current
+    if (dragState.pointerId !== event.pointerId) return
+
+    const deltaX = event.clientX - dragState.startX
+    const deltaY = event.clientY - dragState.startY
+
+    if (!dragState.isHorizontalDrag) {
+      if (Math.abs(deltaX) < 8 && Math.abs(deltaY) < 8) return
+      if (Math.abs(deltaY) > Math.abs(deltaX)) {
+        resetProjectSliderDrag()
+        return
+      }
+      dragState.isHorizontalDrag = true
+    }
+
+    const maxDrag = dragState.width * 0.3
+    const limitedOffset = Math.max(-maxDrag, Math.min(maxDrag, deltaX))
+
+    dragState.deltaX = limitedOffset
+    setProjectDragOffset(limitedOffset)
+  }
+
+  const handleProjectSliderPointerEnd = (event) => {
+    const dragState = projectSliderDragStateRef.current
+    if (dragState.pointerId !== event.pointerId) return
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+
+    const swipeDistance = dragState.deltaX
+    const swipeThreshold = Math.min(150, dragState.width * 0.16)
+
+    if (Math.abs(swipeDistance) >= swipeThreshold) {
+      if (swipeDistance < 0) {
+        goToNextProject()
+      } else {
+        goToPreviousProject()
+      }
+    }
+
+    resetProjectSliderDrag()
+  }
 
   return (
     <div className="portfolio-bg relative min-h-screen overflow-hidden bg-gradient-to-b from-brand-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
@@ -385,14 +483,14 @@ function App() {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setActiveProject((current) => (current - 1 + projects.length) % projects.length)}
+                  onClick={goToPreviousProject}
                   className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
                 >
                   Prev
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveProject((current) => (current + 1) % projects.length)}
+                  onClick={goToNextProject}
                   className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
                 >
                   Next
@@ -401,10 +499,22 @@ function App() {
             </div>
 
             <div className="relative overflow-hidden rounded-2xl border border-transparent bg-gradient-to-r from-brand-500/60 via-cyan-400/60 to-brand-500/60 p-[1.5px]">
-              <div className="overflow-hidden rounded-2xl bg-white/90 dark:bg-slate-950/95">
               <div
-                className="flex transition-transform duration-700 ease-out"
-                style={{ transform: `translateX(-${activeProject * 100}%)` }}
+                ref={projectSliderViewportRef}
+                className={`overflow-hidden rounded-2xl bg-white/90 dark:bg-slate-950/95 ${
+                  isDraggingProjectSlider ? 'cursor-grabbing select-none' : 'cursor-grab'
+                }`}
+                style={{ touchAction: 'pan-y' }}
+                onMouseEnter={() => setIsProjectSliderHovered(true)}
+                onMouseLeave={() => setIsProjectSliderHovered(false)}
+                onPointerDown={handleProjectSliderPointerDown}
+                onPointerMove={handleProjectSliderPointerMove}
+                onPointerUp={handleProjectSliderPointerEnd}
+                onPointerCancel={handleProjectSliderPointerEnd}
+              >
+              <div
+                className={`flex ${isDraggingProjectSlider ? '' : 'transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]'}`}
+                style={{ transform: `translate3d(calc(-${activeProject * 100}% + ${projectDragOffset}px), 0, 0)` }}
               >
                 {projects.map((project) => (
                   <article key={project.name} className="w-full shrink-0 px-1">
