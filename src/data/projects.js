@@ -1,5 +1,21 @@
 const projects = [
   {
+    name: 'COY Hotel',
+    description:
+      'Hotel website project focused on clean booking flow, modern responsive layout, and practical frontend-backend integration.',
+    stack: ['React', 'Tailwind CSS', 'PHP'],
+    imagePath: '/images/COYhotel.png',
+    githubUrl: 'https://github.com/daniel0979/COYhotel',
+  },
+  {
+    name: 'AetherShelf Library',
+    description:
+      'The first real project: a library management platform focused on organizing books, managing records, and streamlining day-to-day library workflows.',
+    stack: ['Laravel', 'JavaScript', 'Tailwind CSS', 'MySQL'],
+    imagePath: '/images/library.png',
+    githubUrl: 'https://github.com/daniel0979/library',
+  },
+  {
     name: 'RCC Camp Web',
     description:
       'My first project: a retail website focused on core frontend structure, product presentation, and clean page layout.',
