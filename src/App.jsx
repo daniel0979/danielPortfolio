@@ -1,6 +1,15 @@
 ﻿import { useEffect, useRef, useState } from 'react'
-import { FaCss3Alt, FaFacebookF, FaGithub, FaHtml5, FaInstagram, FaLinkedinIn, FaPhp, FaReact } from 'react-icons/fa'
-import { SiJavascript, SiKotlin, SiLaravel, SiMysql, SiTailwindcss } from 'react-icons/si'
+import { FaCss3Alt, FaFacebookF, FaGithub, FaHtml5, FaInstagram, FaJava, FaLinkedinIn, FaPhp, FaReact } from 'react-icons/fa'
+import {
+  SiJavascript,
+  SiKotlin,
+  SiLaravel,
+  SiMysql,
+  SiNodedotjs,
+  SiNextdotjs,
+  SiPostgresql,
+  SiTailwindcss,
+} from 'react-icons/si'
 import SectionTitle from './components/SectionTitle'
 import projects from './data/projects'
 
@@ -149,6 +158,14 @@ function App() {
   const [isDraggingProjectSlider, setIsDraggingProjectSlider] = useState(false)
   const [projectDragOffset, setProjectDragOffset] = useState(0)
   const [showContactForm, setShowContactForm] = useState(false)
+  const [contactFormData, setContactFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+    website: '',
+  })
+  const [isSendingContactMessage, setIsSendingContactMessage] = useState(false)
+  const [contactFormStatus, setContactFormStatus] = useState({ type: 'idle', message: '' })
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -211,6 +228,29 @@ function App() {
       gradient: 'from-fuchsia-500 via-violet-500 to-indigo-500',
     },
   ]
+  const learningTracks = [
+    {
+      category: 'Frontend',
+      detail: 'Learning modern routing, hybrid rendering, and production patterns.',
+      tools: [{ name: 'Next.js', Icon: SiNextdotjs, iconClass: 'text-slate-900 dark:text-slate-100' }],
+      gradient: 'from-slate-700 via-slate-800 to-slate-900',
+    },
+    {
+      category: 'Backend',
+      detail: 'Practicing API design and scalable server architecture in two ecosystems.',
+      tools: [
+        { name: 'Node.js', Icon: SiNodedotjs, iconClass: 'text-emerald-500' },
+        { name: 'Java', Icon: FaJava, iconClass: 'text-orange-500' },
+      ],
+      gradient: 'from-emerald-500 via-teal-500 to-cyan-500',
+    },
+    {
+      category: 'Database',
+      detail: 'Studying relational schema design, indexing strategy, and query tuning.',
+      tools: [{ name: 'PostgreSQL', Icon: SiPostgresql, iconClass: 'text-sky-600' }],
+      gradient: 'from-sky-500 via-blue-500 to-indigo-500',
+    },
+  ]
   const cvFilePath = '/images/aung-khant-min-cv.pdf'
   const totalProjects = projects.length
   const uniqueStackCount = new Set(projects.flatMap((project) => project.stack)).size
@@ -236,6 +276,7 @@ function App() {
     },
   ]
   const [skillsRangeRef, isSkillsRangeVisible] = useInView({ threshold: 0.24, rootMargin: '0px 0px -12% 0px' })
+  const [learningTracksRef, isLearningTracksVisible] = useInView({ threshold: 0.2, rootMargin: '0px 0px -8% 0px' })
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme')
@@ -294,6 +335,16 @@ function App() {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  useEffect(() => {
+    if (contactFormStatus.type !== 'success') return
+
+    const hideMessageTimer = window.setTimeout(() => {
+      setContactFormStatus({ type: 'idle', message: '' })
+    }, 4800)
+
+    return () => window.clearTimeout(hideMessageTimer)
+  }, [contactFormStatus])
 
   const educationTimeline = [
     {
@@ -400,6 +451,80 @@ function App() {
     }
 
     resetProjectSliderDrag()
+  }
+
+  const handleContactInputChange = (event) => {
+    const { name, value } = event.target
+    setContactFormData((current) => ({
+      ...current,
+      [name]: value,
+    }))
+
+    if (contactFormStatus.type !== 'idle') {
+      setContactFormStatus({ type: 'idle', message: '' })
+    }
+  }
+
+  const handleContactFormSubmit = async (event) => {
+    event.preventDefault()
+    if (isSendingContactMessage) return
+
+    const payload = {
+      name: contactFormData.name.trim(),
+      email: contactFormData.email.trim(),
+      message: contactFormData.message.trim(),
+      website: contactFormData.website.trim(),
+    }
+
+    if (!payload.name || !payload.email || !payload.message) {
+      setContactFormStatus({ type: 'error', message: 'Please fill in name, email, and message.' })
+      return
+    }
+
+    try {
+      setIsSendingContactMessage(true)
+      setContactFormStatus({ type: 'idle', message: '' })
+
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+
+      const result = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        throw new Error(result?.message || 'Failed to send message. Please try again.')
+      }
+
+      setContactFormStatus({
+        type: 'success',
+        message: result?.message || 'Message sent successfully. I will reply soon.',
+      })
+      setContactFormData({
+        name: '',
+        email: '',
+        message: '',
+        website: '',
+      })
+    } catch (error) {
+      let message = 'Failed to send message. Please try again.'
+
+      if (error instanceof TypeError) {
+        message = 'Contact server is unreachable. Run `npm run dev` and configure `.env` SMTP settings.'
+      } else if (error instanceof Error && error.message) {
+        message = error.message
+      }
+
+      setContactFormStatus({
+        type: 'error',
+        message,
+      })
+    } finally {
+      setIsSendingContactMessage(false)
+    }
   }
 
   return (
@@ -684,6 +809,53 @@ function App() {
               ))}
             </div>
           </div>
+
+          <div
+            ref={learningTracksRef}
+            className="mt-6 rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-lg shadow-slate-900/5 ring-1 ring-white/40 backdrop-blur dark:border-slate-700 dark:bg-slate-900/75 dark:ring-slate-700 sm:p-6"
+          >
+            <div className="flex flex-wrap items-end justify-between gap-2">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-500 dark:text-brand-200">Currently Learning</p>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  New technologies I am actively studying right now.
+                </p>
+              </div>
+              <span className="rounded-full bg-brand-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-600 dark:bg-brand-900/60 dark:text-brand-100">
+                2026 learning path
+              </span>
+            </div>
+
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              {learningTracks.map((track, index) => (
+                <article
+                  key={track.category}
+                  className={`rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm transition-all duration-700 dark:border-slate-700 dark:bg-slate-900/85 ${
+                    isLearningTracksVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                  }`}
+                  style={{ transitionDelay: `${120 + index * 130}ms` }}
+                >
+                  <div
+                    className={`inline-flex items-center rounded-full bg-gradient-to-r ${track.gradient} px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white`}
+                  >
+                    {track.category}
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">{track.detail}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {track.tools.map(({ name, Icon, iconClass }) => (
+                      <span
+                        key={name}
+                        className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                      >
+                        <Icon className={`text-base ${iconClass}`} />
+                        {name}
+                      </span>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
         </section>
 
         <section id="education">
@@ -853,11 +1025,19 @@ function App() {
           </div>
 
           {showContactForm ? (
-            <form action="https://formsubmit.co/akmdaniel2@gmail.com" method="POST" className="mt-8 grid gap-4 md:grid-cols-2">
-              <input type="hidden" name="_subject" value="New Portfolio Contact Message" />
-              <input type="hidden" name="_template" value="table" />
-              <input type="hidden" name="_next" value="https://formsubmit.co/thanks" />
-
+            <form onSubmit={handleContactFormSubmit} className="mt-8 grid gap-4 md:grid-cols-2">
+              <div className="hidden" aria-hidden="true">
+                <label htmlFor="website">Website</label>
+                <input
+                  id="website"
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={contactFormData.website}
+                  onChange={handleContactInputChange}
+                />
+              </div>
               <div className="md:col-span-1">
                 <label htmlFor="name" className="mb-1 block text-sm font-semibold text-brand-100">
                   Name
@@ -867,6 +1047,10 @@ function App() {
                   name="name"
                   type="text"
                   required
+                  minLength={2}
+                  maxLength={80}
+                  value={contactFormData.name}
+                  onChange={handleContactInputChange}
                   className="w-full rounded-xl border border-brand-100/40 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-brand-100/70 focus:border-white focus:outline-none"
                   placeholder="Your name"
                 />
@@ -881,6 +1065,9 @@ function App() {
                   name="email"
                   type="email"
                   required
+                  maxLength={120}
+                  value={contactFormData.email}
+                  onChange={handleContactInputChange}
                   className="w-full rounded-xl border border-brand-100/40 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-brand-100/70 focus:border-white focus:outline-none"
                   placeholder="you@example.com"
                 />
@@ -895,6 +1082,10 @@ function App() {
                   name="message"
                   rows="5"
                   required
+                  minLength={10}
+                  maxLength={4000}
+                  value={contactFormData.message}
+                  onChange={handleContactInputChange}
                   className="w-full rounded-xl border border-brand-100/40 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-brand-100/70 focus:border-white focus:outline-none"
                   placeholder="Tell me about your project..."
                 />
@@ -903,10 +1094,44 @@ function App() {
               <div className="md:col-span-2">
                 <button
                   type="submit"
-                  className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-brand-900 transition hover:bg-brand-100"
+                  disabled={isSendingContactMessage}
+                  className={`contact-send-btn inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-brand-900 transition hover:bg-brand-100 disabled:cursor-not-allowed disabled:opacity-70 ${
+                    isSendingContactMessage ? 'contact-send-btn-busy' : ''
+                  }`}
                 >
-                  Send Message
+                  {isSendingContactMessage ? (
+                    <>
+                      <span className="contact-spinner" aria-hidden="true" />
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    'Send Message'
+                  )}
                 </button>
+
+                {contactFormStatus.type !== 'idle' ? (
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className={`contact-status ${
+                      contactFormStatus.type === 'success' ? 'contact-status-success' : 'contact-status-error'
+                    }`}
+                  >
+                    <span className="contact-status-icon" aria-hidden="true">
+                      {contactFormStatus.type === 'success' ? (
+                        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.6">
+                          <path d="m5 12 4.2 4.2L19 7.8" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.4">
+                          <path d="M12 8.6v4.8M12 17.2h.01" strokeLinecap="round" strokeLinejoin="round" />
+                          <circle cx="12" cy="12" r="9" />
+                        </svg>
+                      )}
+                    </span>
+                    <p>{contactFormStatus.message}</p>
+                  </div>
+                ) : null}
               </div>
             </form>
           ) : null}
