@@ -32,6 +32,7 @@ html.dark body {
   background-size: 52px 52px;
   mask-image: radial-gradient(circle at 25% 15%, black 28%, transparent 72%);
   pointer-events: none;
+  animation: grid-drift 42s linear infinite;
 }
 
 html.dark .portfolio-bg::before {
@@ -41,18 +42,233 @@ html.dark .portfolio-bg::before {
 }
 
 .scroll-dot {
-  animation: pulse-dot 1.3s ease-in-out infinite;
+  animation: pulse-dot 1.7s ease-in-out infinite;
+}
+
+.hero-float {
+  animation: hero-float 9.2s ease-in-out infinite;
+}
+
+.portrait-breathe {
+  transform-origin: center;
+  animation: portrait-breathe 13s ease-in-out infinite;
+}
+
+.ambient-blob {
+  --ambient-duration: 26s;
+  --ambient-delay: 0s;
+  --ambient-base-transform: translate3d(0, 0, 0);
+  animation: ambient-drift var(--ambient-duration) ease-in-out var(--ambient-delay) infinite;
+  will-change: transform, opacity;
+}
+
+.nav-link-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 0.95rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(255, 255, 255, 0.75);
+  color: rgb(51, 65, 85);
+  transition: transform 220ms ease, color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  overflow: hidden;
+}
+
+.nav-link-pill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(47, 109, 246, 0.09), rgba(34, 211, 238, 0.1));
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.nav-link-pill::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 6px;
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, rgba(47, 109, 246, 0.95), rgba(34, 211, 238, 0.95));
+  transform: scaleX(0.3);
+  transform-origin: center;
+  opacity: 0;
+  transition: transform 240ms ease, opacity 240ms ease;
+}
+
+.nav-link-pill:hover {
+  transform: translateY(-1px);
+  border-color: rgba(47, 109, 246, 0.45);
+  color: rgb(30, 58, 138);
+  box-shadow: 0 8px 24px rgba(47, 109, 246, 0.16);
+}
+
+.nav-link-pill:hover::before {
+  opacity: 1;
+}
+
+.nav-link-pill:hover::after {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+html.dark .nav-link-pill {
+  border-color: rgba(100, 116, 139, 0.7);
+  background: rgba(15, 23, 42, 0.75);
+  color: rgb(226, 232, 240);
+}
+
+html.dark .nav-link-pill::before {
+  background: linear-gradient(120deg, rgba(96, 165, 250, 0.2), rgba(34, 211, 238, 0.18));
+}
+
+html.dark .nav-link-pill:hover {
+  border-color: rgba(125, 211, 252, 0.6);
+  color: rgb(224, 242, 254);
+  box-shadow: 0 10px 24px rgba(56, 189, 248, 0.2);
+}
+
+.mobile-nav-panel {
+  transform-origin: top center;
+}
+
+.mobile-nav-link {
+  display: block;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(255, 255, 255, 0.82);
+  padding: 0.7rem 0.85rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgb(51, 65, 85);
+  transition: transform 200ms ease, border-color 200ms ease, color 200ms ease, box-shadow 200ms ease;
+}
+
+.mobile-nav-link:hover {
+  transform: translateX(3px);
+  border-color: rgba(47, 109, 246, 0.45);
+  color: rgb(30, 58, 138);
+  box-shadow: 0 8px 20px rgba(47, 109, 246, 0.14);
+}
+
+html.dark .mobile-nav-link {
+  border-color: rgba(100, 116, 139, 0.7);
+  background: rgba(15, 23, 42, 0.82);
+  color: rgb(226, 232, 240);
+}
+
+html.dark .mobile-nav-link:hover {
+  border-color: rgba(125, 211, 252, 0.6);
+  color: rgb(224, 242, 254);
+  box-shadow: 0 8px 20px rgba(56, 189, 248, 0.2);
+}
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 34px rgba(15, 34, 71, 0.14);
+  border-color: rgba(47, 109, 246, 0.35);
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.42) 45%, transparent 65%);
+  transform: translateX(-130%);
+  transition: transform 520ms ease;
+  pointer-events: none;
+}
+
+.stat-card:hover::after {
+  transform: translateX(130%);
+}
+
+.stat-number {
+  letter-spacing: -0.03em;
+}
+
+.skill-fill {
+  position: relative;
+  overflow: hidden;
+}
+
+.skill-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 24%, rgba(255, 255, 255, 0.36), transparent 82%);
+  animation: skill-glint 4.4s linear infinite;
 }
 
 @keyframes pulse-dot {
   0%,
   100% {
     transform: translateY(0);
-    opacity: 0.7;
+    opacity: 0.65;
   }
   50% {
-    transform: translateY(3px);
+    transform: translateY(2px);
     opacity: 1;
+  }
+}
+
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.2deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(0.2deg);
+  }
+}
+
+@keyframes portrait-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.025);
+  }
+}
+
+@keyframes ambient-drift {
+  0%,
+  100% {
+    transform: var(--ambient-base-transform) scale(1);
+    opacity: 0.72;
+  }
+  50% {
+    transform: var(--ambient-base-transform) translate3d(0, -12px, 0) scale(1.04);
+    opacity: 0.92;
+  }
+}
+
+@keyframes grid-drift {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 52px 26px;
+  }
+}
+
+@keyframes skill-glint {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
   }
 }
 
@@ -64,7 +280,7 @@ html.dark .portfolio-bg::before {
   filter: blur(60px);
   z-index: 0;
   pointer-events: none;
-  animation: float-glow 10s ease-in-out infinite;
+  animation: float-glow 14s ease-in-out infinite;
 }
 
 .footer-glow::before {
@@ -132,10 +348,34 @@ html.dark .portfolio-bg::before {
   0%,
   100% {
     transform: translateY(0);
-    opacity: 0.75;
+    opacity: 0.72;
   }
   50% {
-    transform: translateY(10px);
+    transform: translateY(6px);
     opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto;
+  }
+
+  .nav-link-pill,
+  .mobile-nav-link,
+  .mobile-nav-panel {
+    transition: none !important;
+  }
+
+  .portfolio-bg::before,
+  .scroll-dot,
+  .hero-float,
+  .portrait-breathe,
+  .ambient-blob,
+  .mobile-nav-panel,
+  .skill-fill::after,
+  .footer-glow::before,
+  .footer-glow::after {
+    animation: none !important;
   }
 }

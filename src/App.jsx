@@ -53,6 +53,60 @@ function RevealText({ text, className, as: Tag = 'p', step = 35 }) {
   )
 }
 
+function useCountUp(target, { duration = 1400, start = 0, shouldStart = true } = {}) {
+  const [value, setValue] = useState(start)
+
+  useEffect(() => {
+    if (!shouldStart) {
+      setValue(start)
+      return
+    }
+
+    let frameId = null
+    let startTime = null
+
+    const animate = (timestamp) => {
+      if (startTime === null) startTime = timestamp
+      const progress = Math.min((timestamp - startTime) / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setValue(Math.round(start + (target - start) * eased))
+
+      if (progress < 1) {
+        frameId = window.requestAnimationFrame(animate)
+      }
+    }
+
+    frameId = window.requestAnimationFrame(animate)
+    return () => {
+      if (frameId !== null) window.cancelAnimationFrame(frameId)
+    }
+  }, [duration, shouldStart, start, target])
+
+  return value
+}
+
+function StatCounterCard({ label, value, suffix = '', detail, delay = 0 }) {
+  const [ref, isVisible] = useInView({ threshold: 0.35, rootMargin: '0px 0px -8% 0px' })
+  const countedValue = useCountUp(value, { duration: 1200 + delay, shouldStart: isVisible })
+
+  return (
+    <article
+      ref={ref}
+      className={`stat-card rounded-2xl border border-slate-200/80 bg-white/85 p-5 shadow-lg shadow-slate-900/5 backdrop-blur transition-all duration-700 dark:border-slate-700 dark:bg-slate-900/80 ${
+        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+      }`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-500 dark:text-brand-200">{label}</p>
+      <p className="stat-number mt-3 text-3xl font-black text-slate-900 dark:text-white">
+        {countedValue}
+        {suffix}
+      </p>
+      <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{detail}</p>
+    </article>
+  )
+}
+
 function VoguzPreview() {
   return (
     <div className="mb-5 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
@@ -89,6 +143,7 @@ function VoguzPreview() {
 function App() {
   const [theme, setTheme] = useState('light')
   const [selectedMarks, setSelectedMarks] = useState(null)
+  const [showCvPreview, setShowCvPreview] = useState(false)
   const [activeProject, setActiveProject] = useState(0)
   const [isProjectSliderHovered, setIsProjectSliderHovered] = useState(false)
   const [isDraggingProjectSlider, setIsDraggingProjectSlider] = useState(false)
@@ -96,6 +151,7 @@ function App() {
   const [showContactForm, setShowContactForm] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const projectSliderViewportRef = useRef(null)
   const projectSliderDragStateRef = useRef({
     pointerId: null,
@@ -116,6 +172,70 @@ function App() {
     { name: 'Kotlin', Icon: SiKotlin, iconClass: 'text-violet-500' },
     { name: 'MySQL', Icon: SiMysql, iconClass: 'text-blue-600' },
   ]
+  const navLinks = [
+    { label: 'About', href: '#about' },
+    { label: 'Skills', href: '#skills' },
+    { label: 'Education', href: '#education' },
+    { label: 'Projects', href: '#projects' },
+    { label: 'Contact', href: '#contact' },
+  ]
+  const skillRanges = [
+    {
+      name: 'Frontend Engineering',
+      level: 93,
+      detail: 'React component architecture, responsive layouts, and polished UX interactions.',
+      gradient: 'from-cyan-500 via-sky-500 to-indigo-500',
+    },
+    {
+      name: 'Backend Development',
+      level: 86,
+      detail: 'PHP and Laravel API/database workflows focused on practical production features.',
+      gradient: 'from-emerald-500 via-teal-500 to-cyan-500',
+    },
+    {
+      name: 'Database Management',
+      level: 82,
+      detail: 'MySQL schema planning, data handling, and reliable CRUD operations.',
+      gradient: 'from-blue-500 via-indigo-500 to-violet-500',
+    },
+    {
+      name: 'UI Implementation',
+      level: 90,
+      detail: 'Modern Tailwind interfaces with consistent spacing, hierarchy, and accessibility.',
+      gradient: 'from-amber-500 via-orange-500 to-rose-500',
+    },
+    {
+      name: 'Vibe Coding & AI Pairing',
+      level: 96,
+      detail: 'Fast iteration using Codex, DeepSeek, GitHub Copilot, Grok, and other AI assistants with clean production output.',
+      gradient: 'from-fuchsia-500 via-violet-500 to-indigo-500',
+    },
+  ]
+  const cvFilePath = '/images/aung-khant-min-cv.pdf'
+  const totalProjects = projects.length
+  const uniqueStackCount = new Set(projects.flatMap((project) => project.stack)).size
+  const githubProjects = projects.filter((project) => Boolean(project.githubUrl)).length
+  const projectStats = [
+    {
+      label: 'Projects Created',
+      value: totalProjects,
+      suffix: '+',
+      detail: 'Portfolio projects designed and implemented from idea to working product.',
+    },
+    {
+      label: 'Tech Used',
+      value: uniqueStackCount,
+      suffix: '+',
+      detail: 'Languages and frameworks used across frontend and backend builds.',
+    },
+    {
+      label: 'GitHub Repos',
+      value: githubProjects,
+      suffix: '+',
+      detail: 'Project repositories available with code structure and implementation details.',
+    },
+  ]
+  const [skillsRangeRef, isSkillsRangeVisible] = useInView({ threshold: 0.24, rootMargin: '0px 0px -12% 0px' })
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme')
@@ -134,11 +254,11 @@ function App() {
   }, [theme])
 
   useEffect(() => {
-    document.body.style.overflow = selectedMarks ? 'hidden' : ''
+    document.body.style.overflow = selectedMarks || showCvPreview ? 'hidden' : ''
     return () => {
       document.body.style.overflow = ''
     }
-  }, [selectedMarks])
+  }, [selectedMarks, showCvPreview])
 
   useEffect(() => {
     if (projects.length < 2 || isProjectSliderHovered || isDraggingProjectSlider) return
@@ -162,6 +282,17 @@ function App() {
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   const educationTimeline = [
@@ -281,77 +412,141 @@ function App() {
       </div>
 
       <div className="pointer-events-none absolute inset-0 -z-0">
-        <div className="absolute -left-20 top-12 h-72 w-72 rounded-full bg-cyan-300/45 blur-3xl dark:bg-cyan-500/20" />
-        <div className="absolute right-[-80px] top-40 h-80 w-80 rounded-full bg-fuchsia-300/45 blur-3xl dark:bg-fuchsia-500/20" />
-        <div className="absolute left-1/3 top-[34rem] h-72 w-72 rounded-full bg-amber-300/45 blur-3xl dark:bg-amber-500/20" />
-        <div className="absolute bottom-24 left-[-70px] h-80 w-80 rounded-full bg-emerald-300/45 blur-3xl dark:bg-emerald-500/20" />
-        <div className="absolute right-[8%] top-[62rem] h-64 w-64 rounded-full bg-rose-300/35 blur-3xl dark:bg-rose-500/20" />
-        <div className="absolute left-[10%] top-[90rem] h-72 w-72 rounded-full bg-indigo-300/30 blur-3xl dark:bg-indigo-500/20" />
-        <div className="absolute right-[-40px] top-[120rem] h-80 w-80 rounded-full bg-sky-300/35 blur-3xl dark:bg-sky-500/20" />
-        <div className="absolute left-1/2 top-[146rem] h-64 w-64 -translate-x-1/2 rounded-full bg-lime-300/30 blur-3xl dark:bg-lime-500/20" />
-        <div className="absolute left-[-50px] top-[170rem] h-72 w-72 rounded-full bg-pink-300/30 blur-3xl dark:bg-pink-500/20" />
-        <div className="absolute right-[12%] bottom-[18rem] h-64 w-64 rounded-full bg-violet-300/30 blur-3xl dark:bg-violet-500/20" />
+        <div
+          className="ambient-blob absolute -left-20 top-12 h-72 w-72 rounded-full bg-cyan-300/45 blur-3xl dark:bg-cyan-500/20"
+          style={{ '--ambient-duration': '26s', '--ambient-delay': '-3s' }}
+        />
+        <div
+          className="ambient-blob absolute right-[-80px] top-40 h-80 w-80 rounded-full bg-fuchsia-300/45 blur-3xl dark:bg-fuchsia-500/20"
+          style={{ '--ambient-duration': '30s', '--ambient-delay': '-9s' }}
+        />
+        <div
+          className="ambient-blob absolute left-1/3 top-[34rem] h-72 w-72 rounded-full bg-amber-300/45 blur-3xl dark:bg-amber-500/20"
+          style={{ '--ambient-duration': '25s', '--ambient-delay': '-5s' }}
+        />
+        <div
+          className="ambient-blob absolute bottom-24 left-[-70px] h-80 w-80 rounded-full bg-emerald-300/45 blur-3xl dark:bg-emerald-500/20"
+          style={{ '--ambient-duration': '28s', '--ambient-delay': '-11s' }}
+        />
+        <div
+          className="ambient-blob absolute right-[8%] top-[62rem] h-64 w-64 rounded-full bg-rose-300/35 blur-3xl dark:bg-rose-500/20"
+          style={{ '--ambient-duration': '24s', '--ambient-delay': '-7s' }}
+        />
+        <div
+          className="ambient-blob absolute left-[10%] top-[90rem] h-72 w-72 rounded-full bg-indigo-300/30 blur-3xl dark:bg-indigo-500/20"
+          style={{ '--ambient-duration': '29s', '--ambient-delay': '-13s' }}
+        />
+        <div
+          className="ambient-blob absolute right-[-40px] top-[120rem] h-80 w-80 rounded-full bg-sky-300/35 blur-3xl dark:bg-sky-500/20"
+          style={{ '--ambient-duration': '27s', '--ambient-delay': '-4s' }}
+        />
+        <div
+          className="ambient-blob absolute left-1/2 top-[146rem] h-64 w-64 -translate-x-1/2 rounded-full bg-lime-300/30 blur-3xl dark:bg-lime-500/20"
+          style={{ '--ambient-duration': '31s', '--ambient-delay': '-10s', '--ambient-base-transform': 'translateX(-50%)' }}
+        />
+        <div
+          className="ambient-blob absolute left-[-50px] top-[170rem] h-72 w-72 rounded-full bg-pink-300/30 blur-3xl dark:bg-pink-500/20"
+          style={{ '--ambient-duration': '26s', '--ambient-delay': '-14s' }}
+        />
+        <div
+          className="ambient-blob absolute right-[12%] bottom-[18rem] h-64 w-64 rounded-full bg-violet-300/30 blur-3xl dark:bg-violet-500/20"
+          style={{ '--ambient-duration': '30s', '--ambient-delay': '-6s' }}
+        />
       </div>
 
-      <header className="relative z-10 mx-auto max-w-5xl px-6 pb-20 pt-16">
-        <nav className="mb-12 flex flex-wrap items-center justify-between gap-4">
-          <div className="rounded-2xl border border-white/60 bg-white/70 px-3 py-2 shadow-lg shadow-brand-500/10 backdrop-blur dark:border-slate-700 dark:bg-slate-900/70">
-            <div className="flex items-center gap-3">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-sm font-extrabold text-white dark:bg-brand-500">
-                AK
-              </span>
-              <div>
-                <p className="text-lg font-black tracking-tight text-slate-900 dark:text-white">Aung Khant Min</p>
-                <div className="mt-0.5 inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-200">
-                  Full Stack Developer
+      <header className="relative z-10 mx-auto max-w-5xl px-4 pb-20 pt-12 sm:px-6 sm:pt-16">
+        <nav className="mb-12 rounded-3xl border border-white/60 bg-white/70 p-3 shadow-xl shadow-brand-500/10 backdrop-blur dark:border-slate-700 dark:bg-slate-900/70 sm:p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 rounded-2xl border border-white/60 bg-white/70 px-3 py-2 shadow-lg shadow-brand-500/10 backdrop-blur dark:border-slate-700 dark:bg-slate-900/70">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-xs font-extrabold text-white dark:bg-brand-500 sm:h-10 sm:w-10 sm:text-sm">
+                  AK
+                </span>
+                <div className="min-w-0">
+                  <p className="max-w-[9.5rem] truncate text-sm font-black tracking-tight text-slate-900 dark:text-white sm:max-w-none sm:text-lg">Aung Khant Min</p>
+                  <div className="mt-0.5 hidden items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-200 sm:inline-flex">
+                    Full Stack Developer
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="flex items-center gap-6 text-sm font-medium text-slate-700 dark:text-slate-200">
-            <a href="#about" className="hover:text-brand-600 dark:hover:text-brand-100">
-              About
-            </a>
-            <a href="#education" className="hover:text-brand-600 dark:hover:text-brand-100">
-              Education
-            </a>
-            <a href="#projects" className="hover:text-brand-600 dark:hover:text-brand-100">
-              Projects
-            </a>
-            <a href="#contact" className="hover:text-brand-600 dark:hover:text-brand-100">
-              Contact
-            </a>
-            <button
-              type="button"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-              className={`relative inline-flex h-9 w-16 items-center rounded-full border p-1 transition-all duration-300 ${
-                theme === 'dark'
-                  ? 'border-slate-600 bg-slate-900 shadow-inner shadow-slate-950'
-                  : 'border-amber-200 bg-gradient-to-r from-amber-200 to-orange-200 shadow-inner shadow-amber-300/60'
-              }`}
-            >
-              <span
-                className={`absolute left-1 top-1 inline-flex h-7 w-7 items-center justify-center rounded-full transition-all duration-300 ${
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen((current) => !current)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 bg-white/80 text-slate-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:border-brand-200 dark:hover:text-brand-100 md:hidden"
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-nav-menu"
+                aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+                  {isMobileMenuOpen ? (
+                    <path d="m6 6 12 12M18 6 6 18" strokeLinecap="round" />
+                  ) : (
+                    <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+                  )}
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                className={`relative inline-flex h-9 w-16 items-center rounded-full border p-1 transition-all duration-300 ${
                   theme === 'dark'
-                    ? 'translate-x-7 bg-slate-800 text-slate-100 shadow-lg shadow-black/40'
-                    : 'translate-x-0 bg-white text-amber-500 shadow-lg shadow-amber-400/60'
+                    ? 'border-slate-600 bg-slate-900 shadow-inner shadow-slate-950'
+                    : 'border-amber-200 bg-gradient-to-r from-amber-200 to-orange-200 shadow-inner shadow-amber-300/60'
                 }`}
               >
-                {theme === 'dark' ? (
-                  <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <path d="M21 13.2A8.8 8.8 0 1 1 10.8 3a7.4 7.4 0 1 0 10.2 10.2Z" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <circle cx="12" cy="12" r="4" />
-                    <path d="M12 2.5v2M12 19.5v2M21.5 12h-2M4.5 12h-2M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4M18.7 18.7l-1.4-1.4M6.7 6.7L5.3 5.3" />
-                  </svg>
-                )}
-              </span>
-              <span className="sr-only">{theme === 'dark' ? 'Dark mode active' : 'Light mode active'}</span>
-            </button>
+                <span
+                  className={`absolute left-1 top-1 inline-flex h-7 w-7 items-center justify-center rounded-full transition-all duration-300 ${
+                    theme === 'dark'
+                      ? 'translate-x-7 bg-slate-800 text-slate-100 shadow-lg shadow-black/40'
+                      : 'translate-x-0 bg-white text-amber-500 shadow-lg shadow-amber-400/60'
+                  }`}
+                >
+                  {theme === 'dark' ? (
+                    <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <path d="M21 13.2A8.8 8.8 0 1 1 10.8 3a7.4 7.4 0 1 0 10.2 10.2Z" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <circle cx="12" cy="12" r="4" />
+                      <path d="M12 2.5v2M12 19.5v2M21.5 12h-2M4.5 12h-2M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4M18.7 18.7l-1.4-1.4M6.7 6.7L5.3 5.3" />
+                    </svg>
+                  )}
+                </span>
+                <span className="sr-only">{theme === 'dark' ? 'Dark mode active' : 'Light mode active'}</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4 hidden flex-wrap items-center gap-2 text-sm font-medium md:flex">
+            {navLinks.map((link) => (
+              <a key={link.href} href={link.href} className="nav-link-pill">
+                <span className="relative z-[1]">{link.label}</span>
+              </a>
+            ))}
+          </div>
+
+          <div
+            id="mobile-nav-menu"
+            className={`mobile-nav-panel mt-3 grid gap-2 overflow-hidden transition-all duration-300 md:hidden ${
+              isMobileMenuOpen ? 'max-h-80 translate-y-0 opacity-100' : 'pointer-events-none max-h-0 -translate-y-2 opacity-0'
+            }`}
+          >
+            {navLinks.map((link) => (
+              <a
+                key={`mobile-${link.href}`}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="mobile-nav-link"
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
         </nav>
 
@@ -380,16 +575,23 @@ function App() {
                 </span>
               ))}
             </div>
-            <div className="mt-8 flex gap-4">
+            <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href="#projects"
-                className="rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="w-full rounded-full bg-slate-900 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto"
               >
                 View Projects
               </a>
+              <button
+                type="button"
+                onClick={() => setShowCvPreview(true)}
+                className="w-full rounded-full bg-gradient-to-r from-brand-500 to-cyan-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-500/30 transition hover:scale-[1.02] hover:from-brand-600 hover:to-cyan-600 sm:w-auto"
+              >
+                Download CV
+              </button>
               <a
                 href="#contact"
-                className="rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-brand-100 dark:hover:text-brand-100"
+                className="w-full rounded-full border border-slate-300 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-brand-100 dark:hover:text-brand-100 sm:w-auto"
               >
                 Contact Me
               </a>
@@ -399,11 +601,11 @@ function App() {
               Scroll for more
             </div>
           </div>
-          <div className="rounded-3xl bg-white p-6 shadow-xl ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700">
+          <div className="hero-float rounded-3xl bg-white p-6 shadow-xl ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700">
             <img
               src="/images/profile.jpg"
               alt="Aung Khant Min profile"
-              className="h-80 w-full rounded-2xl object-cover object-[center_25%] ring-1 ring-slate-200 dark:ring-slate-700"
+              className="portrait-breathe h-80 w-full rounded-2xl object-cover object-[center_25%] ring-1 ring-slate-200 dark:ring-slate-700"
             />
             <p className="mt-4 text-lg font-bold text-slate-900 dark:text-white">Aung Khant Min</p>
             <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Full Stack Developer</p>
@@ -419,7 +621,7 @@ function App() {
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto max-w-5xl space-y-20 px-6 pb-20">
+      <main className="relative z-10 mx-auto max-w-5xl space-y-20 px-4 pb-20 sm:px-6">
         <section id="about">
           <SectionTitle eyebrow="About" title="A quick introduction" />
           <RevealText
@@ -427,6 +629,61 @@ function App() {
             className="max-w-3xl text-slate-700 dark:text-slate-300"
             step={12}
           />
+        </section>
+
+        <section id="skills">
+          <SectionTitle eyebrow="Skills" title="Skill range and delivery details" />
+          <div className="grid gap-6 lg:grid-cols-[1.15fr_1fr]">
+            <div
+              ref={skillsRangeRef}
+              className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-lg shadow-slate-900/5 ring-1 ring-white/40 backdrop-blur dark:border-slate-700 dark:bg-slate-900/75 dark:ring-slate-700"
+            >
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-500 dark:text-brand-200">Skill Range</p>
+              <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
+                Current confidence level based on projects I have delivered and tools I use daily.
+              </p>
+              <div className="mt-6 space-y-5">
+                {skillRanges.map((skill, index) => (
+                  <article
+                    key={skill.name}
+                    className={`transition-all duration-700 ${isSkillsRangeVisible ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'}`}
+                    style={{ transitionDelay: `${index * 110}ms` }}
+                  >
+                    <div className="mb-2 flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-white">{skill.name}</h3>
+                      <span className="text-xs font-bold text-brand-500 dark:text-brand-200">{skill.level}%</span>
+                    </div>
+                    <div className="h-2.5 overflow-hidden rounded-full bg-slate-200/80 dark:bg-slate-700/80">
+                      <div
+                        className={`skill-fill h-full rounded-full bg-gradient-to-r ${skill.gradient} transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                          isSkillsRangeVisible ? 'scale-x-100' : 'scale-x-0'
+                        }`}
+                        style={{
+                          width: `${skill.level}%`,
+                          transformOrigin: 'left',
+                          transitionDelay: `${100 + index * 150}ms`,
+                        }}
+                      />
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-slate-600 dark:text-slate-300">{skill.detail}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-4">
+              {projectStats.map((item, index) => (
+                <StatCounterCard
+                  key={item.label}
+                  label={item.label}
+                  value={item.value}
+                  suffix={item.suffix}
+                  detail={item.detail}
+                  delay={index * 140}
+                />
+              ))}
+            </div>
+          </div>
         </section>
 
         <section id="education">
@@ -476,10 +733,15 @@ function App() {
           <div className="relative overflow-hidden rounded-3xl border border-white/50 bg-white/70 p-4 shadow-2xl shadow-brand-500/10 ring-1 ring-slate-200 backdrop-blur dark:border-slate-700 dark:bg-slate-900/70 dark:ring-slate-700 md:p-6">
             <div className="pointer-events-none absolute -left-24 -top-20 h-52 w-52 rounded-full bg-brand-400/20 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-24 -right-14 h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
-            <div className="mb-5 flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-500 dark:text-brand-200">
-                Slide Showcase
-              </p>
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-500 dark:text-brand-200">
+                  Slide Showcase
+                </p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {totalProjects} projects created using {uniqueStackCount} technologies.
+                </p>
+              </div>
               <div className="flex gap-2">
                 <button
                   type="button"
@@ -525,7 +787,7 @@ function App() {
                       {project.featured && !project.imagePath ? <VoguzPreview /> : null}
                       {project.imagePath ? (
                         <div className="mb-5 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950">
-                          <img src={project.imagePath} alt={`${project.name} preview`} className="h-56 w-full object-cover object-top" />
+                          <img src={project.imagePath} alt={`${project.name} preview`} className="h-48 w-full object-cover object-top sm:h-56" />
                         </div>
                       ) : null}
                       <h3 className="text-xl font-bold text-slate-900 dark:text-white">{project.name}</h3>
@@ -652,7 +914,7 @@ function App() {
       </main>
 
       <footer className="footer-glow relative z-10 overflow-hidden border-t border-slate-200/80 bg-white/80 py-16 backdrop-blur dark:border-slate-700 dark:bg-slate-950/80">
-        <div className="mx-auto max-w-5xl space-y-12 px-6">
+        <div className="mx-auto max-w-5xl space-y-12 px-4 sm:px-6">
           <section>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-500 dark:text-brand-200">How I Can Help</p>
             <h2 className="mt-2 bg-gradient-to-r from-brand-600 via-cyan-500 to-brand-500 bg-clip-text text-3xl font-extrabold text-transparent">
@@ -764,6 +1026,48 @@ function App() {
             <path d="M12 18V6M6.5 11.5 12 6l5.5 5.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
+      ) : null}
+
+      {showCvPreview ? (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/75 px-4" onClick={() => setShowCvPreview(false)}>
+          <div
+            className="w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-900"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4 dark:border-slate-700">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Aung Khant Min CV</h3>
+              <div className="flex flex-wrap items-center gap-2">
+                <a
+                  href={cvFilePath}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-slate-600 dark:text-slate-200 dark:hover:border-brand-100 dark:hover:text-brand-100"
+                >
+                  Open in New Tab
+                </a>
+                <a
+                  href={cvFilePath}
+                  download="Aung-Khant-Min-CV.pdf"
+                  className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700"
+                >
+                  Download CV
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setShowCvPreview(false)}
+                  className="rounded-full border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-slate-600 dark:text-slate-200 dark:hover:border-brand-100 dark:hover:text-brand-100"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+            <iframe
+              title="Aung Khant Min CV preview"
+              src={cvFilePath}
+              className="h-[78vh] w-full bg-slate-100 dark:bg-slate-950"
+            />
+          </div>
+        </div>
       ) : null}
 
       {selectedMarks ? (
