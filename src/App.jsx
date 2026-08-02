@@ -1194,11 +1194,11 @@ function App() {
         </section>
       </main>
 
-      <section id="projects" className="relative z-10 mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+      <section id="projects" className="relative z-10 mx-auto w-full max-w-[90rem] px-4 pb-20 sm:px-6 lg:px-10">
         <div className="reveal-item">
           <SectionTitle eyebrow="Portfolio" title="Featured projects" />
         </div>
-        <div className="reveal-item relative overflow-hidden rounded-3xl border border-white/50 bg-white/70 p-5 shadow-2xl shadow-brand-500/10 ring-1 ring-slate-200 backdrop-blur dark:border-slate-700 dark:bg-slate-900/70 dark:ring-slate-700 md:p-8">
+        <div className="reveal-item relative overflow-hidden rounded-3xl border border-white/50 bg-white/70 p-5 shadow-2xl shadow-brand-500/10 ring-1 ring-slate-200 backdrop-blur dark:border-slate-700 dark:bg-slate-900/70 dark:ring-slate-700 md:p-10">
           <div className="pointer-events-none absolute -left-24 -top-20 h-52 w-52 rounded-full bg-brand-400/20 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-24 -right-14 h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -1212,27 +1212,27 @@ function App() {
             </div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 xl:gap-8">
+          <div className="grid gap-6 md:grid-cols-2 xl:gap-10">
             {projects.map((project, index) => (
               <article key={project.name} className="relative">
                 <div
                   ref={(node) => {
                     projectCardRefs.current[index] = node
                   }}
-                  className="tilt-target flex h-full flex-col rounded-2xl border border-slate-200/80 bg-white p-6 shadow-lg shadow-slate-900/5 ring-1 ring-slate-100 transition-shadow duration-300 hover:shadow-2xl hover:shadow-brand-500/15 dark:border-slate-700 dark:bg-slate-900 dark:ring-slate-700 md:p-8"
+                  className="tilt-target flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white p-7 shadow-lg shadow-slate-900/5 ring-1 ring-slate-100 transition-shadow duration-300 hover:shadow-2xl hover:shadow-brand-500/15 dark:border-slate-700 dark:bg-slate-900 dark:ring-slate-700 md:p-10"
                   onMouseMove={(event) => handleProjectCardTiltMove(event, index)}
                   onMouseLeave={(event) => handleProjectCardTiltLeave(event, index)}
                 >
-                  <div className="mb-5 inline-flex items-center rounded-full bg-gradient-to-r from-brand-500 to-cyan-500 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white">
+                  <div className="mb-6 inline-flex items-center rounded-full bg-gradient-to-r from-brand-500 to-cyan-500 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-white">
                     Project {String(index + 1).padStart(2, '0')}
                   </div>
                   {project.featured && !project.imagePath ? <VoguzPreview /> : null}
                   {project.imagePath ? (
-                    <div className="group relative mb-6 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950">
+                    <div className="group relative mb-7 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950">
                       <img
                         src={project.imagePath}
                         alt={`${project.name} preview`}
-                        className="h-52 w-full object-cover object-top transition-transform duration-500 group-hover:scale-105 sm:h-64"
+                        className="h-64 w-full object-cover object-top transition-transform duration-500 group-hover:scale-105 sm:h-80"
                       />
                       <a
                         href={project.githubUrl}
@@ -1241,31 +1241,31 @@ function App() {
                         className="absolute inset-0 flex items-center justify-center bg-slate-900/0 opacity-0 transition-all duration-300 group-hover:bg-slate-900/55 group-hover:opacity-100"
                         aria-label={`View ${project.name} on GitHub`}
                       >
-                        <span className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-slate-900 shadow-lg">
+                        <span className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-slate-900 shadow-lg">
                           <FaGithub /> View GitHub
                         </span>
                       </a>
                     </div>
                   ) : null}
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{project.name}</h3>
-                  <p className="mt-3 text-base leading-7 text-slate-600 dark:text-slate-300">{project.description}</p>
-                  <div className="mt-5 flex flex-wrap gap-2">
+                  <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{project.name}</h3>
+                  <p className="mt-4 text-base leading-8 text-slate-600 dark:text-slate-300 md:text-lg">{project.description}</p>
+                  <div className="mt-6 flex flex-wrap gap-2.5">
                     {project.stack.map((item) => (
                       <span
                         key={item}
-                        className="rounded-full bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-600 dark:bg-brand-900/60 dark:text-brand-100"
+                        className="rounded-full bg-brand-50 px-4 py-1.5 text-sm font-semibold text-brand-600 dark:bg-brand-900/60 dark:text-brand-100"
                       >
                         {item}
                       </span>
                     ))}
                   </div>
                   {project.githubUrl ? (
-                    <div className="mt-auto pt-6">
+                    <div className="mt-auto pt-8">
                       <a
                         href={project.githubUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+                        className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
                       >
                         <FaGithub /> View GitHub
                       </a>
