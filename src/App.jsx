@@ -686,7 +686,7 @@ function App() {
   }
 
   return (
-    <div className="portfolio-bg relative min-h-screen overflow-hidden bg-gradient-to-b from-brand-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+    <div ref={mainRevealRef} className="portfolio-bg relative min-h-screen overflow-hidden bg-gradient-to-b from-brand-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       <div
         ref={cursorGlowRef}
         className="pointer-events-none fixed left-0 top-0 z-[1] hidden h-[400px] w-[400px] rounded-full bg-brand-500/10 blur-3xl dark:bg-cyan-400/10 md:block"
@@ -1039,7 +1039,7 @@ function App() {
         </div>
       </div>
 
-      <main ref={mainRevealRef} className="relative z-10 mx-auto max-w-5xl space-y-20 px-4 pb-20 sm:px-6">
+      <main className="relative z-10 mx-auto max-w-5xl space-y-20 px-4 pb-20 sm:px-6">
         <section id="about" className="reveal-item">
           <SectionTitle eyebrow="About" title="A quick introduction" />
           <RevealText
@@ -1192,89 +1192,93 @@ function App() {
             ))}
           </div>
         </section>
+      </main>
 
-        <section id="projects" className="reveal-item">
+      <section id="projects" className="relative z-10 mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+        <div className="reveal-item">
           <SectionTitle eyebrow="Portfolio" title="Featured projects" />
-          <div className="relative overflow-hidden rounded-3xl border border-white/50 bg-white/70 p-4 shadow-2xl shadow-brand-500/10 ring-1 ring-slate-200 backdrop-blur dark:border-slate-700 dark:bg-slate-900/70 dark:ring-slate-700 md:p-6">
-            <div className="pointer-events-none absolute -left-24 -top-20 h-52 w-52 rounded-full bg-brand-400/20 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-24 -right-14 h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
-            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-500 dark:text-brand-200">
-                  Project Showcase
-                </p>
-                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                  {totalProjects} projects created using {uniqueStackCount} technologies.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid gap-5 md:grid-cols-2">
-              {projects.map((project, index) => (
-                <article key={project.name} className="relative">
-                  <div
-                    ref={(node) => {
-                      projectCardRefs.current[index] = node
-                    }}
-                    className="tilt-target flex h-full flex-col rounded-2xl border border-slate-200/80 bg-white p-5 shadow-lg shadow-slate-900/5 ring-1 ring-slate-100 transition-shadow duration-300 hover:shadow-xl hover:shadow-brand-500/10 dark:border-slate-700 dark:bg-slate-900 dark:ring-slate-700 md:p-6"
-                    onMouseMove={(event) => handleProjectCardTiltMove(event, index)}
-                    onMouseLeave={(event) => handleProjectCardTiltLeave(event, index)}
-                  >
-                    <div className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-brand-500 to-cyan-500 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white">
-                      Project {String(index + 1).padStart(2, '0')}
-                    </div>
-                    {project.featured && !project.imagePath ? <VoguzPreview /> : null}
-                    {project.imagePath ? (
-                      <div className="group relative mb-5 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950">
-                        <img
-                          src={project.imagePath}
-                          alt={`${project.name} preview`}
-                          className="h-44 w-full object-cover object-top transition-transform duration-500 group-hover:scale-105 sm:h-48"
-                        />
-                        <a
-                          href={project.githubUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="absolute inset-0 flex items-center justify-center bg-slate-900/0 opacity-0 transition-all duration-300 group-hover:bg-slate-900/55 group-hover:opacity-100"
-                          aria-label={`View ${project.name} on GitHub`}
-                        >
-                          <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-slate-900 shadow-lg">
-                            <FaGithub /> View GitHub
-                          </span>
-                        </a>
-                      </div>
-                    ) : null}
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">{project.name}</h3>
-                    <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">{project.description}</p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {project.stack.map((item) => (
-                        <span
-                          key={item}
-                          className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-600 dark:bg-brand-900/60 dark:text-brand-100"
-                        >
-                          {item}
-                        </span>
-                      ))}
-                    </div>
-                    {project.githubUrl ? (
-                      <div className="mt-auto pt-6">
-                        <a
-                          href={project.githubUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
-                        >
-                          <FaGithub /> View GitHub
-                        </a>
-                      </div>
-                    ) : null}
-                  </div>
-                </article>
-              ))}
+        </div>
+        <div className="reveal-item relative overflow-hidden rounded-3xl border border-white/50 bg-white/70 p-5 shadow-2xl shadow-brand-500/10 ring-1 ring-slate-200 backdrop-blur dark:border-slate-700 dark:bg-slate-900/70 dark:ring-slate-700 md:p-8">
+          <div className="pointer-events-none absolute -left-24 -top-20 h-52 w-52 rounded-full bg-brand-400/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 -right-14 h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-500 dark:text-brand-200">
+                Project Showcase
+              </p>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                {totalProjects} projects created using {uniqueStackCount} technologies.
+              </p>
             </div>
           </div>
-        </section>
 
+          <div className="grid gap-6 md:grid-cols-2 xl:gap-8">
+            {projects.map((project, index) => (
+              <article key={project.name} className="relative">
+                <div
+                  ref={(node) => {
+                    projectCardRefs.current[index] = node
+                  }}
+                  className="tilt-target flex h-full flex-col rounded-2xl border border-slate-200/80 bg-white p-6 shadow-lg shadow-slate-900/5 ring-1 ring-slate-100 transition-shadow duration-300 hover:shadow-2xl hover:shadow-brand-500/15 dark:border-slate-700 dark:bg-slate-900 dark:ring-slate-700 md:p-8"
+                  onMouseMove={(event) => handleProjectCardTiltMove(event, index)}
+                  onMouseLeave={(event) => handleProjectCardTiltLeave(event, index)}
+                >
+                  <div className="mb-5 inline-flex items-center rounded-full bg-gradient-to-r from-brand-500 to-cyan-500 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white">
+                    Project {String(index + 1).padStart(2, '0')}
+                  </div>
+                  {project.featured && !project.imagePath ? <VoguzPreview /> : null}
+                  {project.imagePath ? (
+                    <div className="group relative mb-6 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950">
+                      <img
+                        src={project.imagePath}
+                        alt={`${project.name} preview`}
+                        className="h-52 w-full object-cover object-top transition-transform duration-500 group-hover:scale-105 sm:h-64"
+                      />
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="absolute inset-0 flex items-center justify-center bg-slate-900/0 opacity-0 transition-all duration-300 group-hover:bg-slate-900/55 group-hover:opacity-100"
+                        aria-label={`View ${project.name} on GitHub`}
+                      >
+                        <span className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-slate-900 shadow-lg">
+                          <FaGithub /> View GitHub
+                        </span>
+                      </a>
+                    </div>
+                  ) : null}
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{project.name}</h3>
+                  <p className="mt-3 text-base leading-7 text-slate-600 dark:text-slate-300">{project.description}</p>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {project.stack.map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-600 dark:bg-brand-900/60 dark:text-brand-100"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                  {project.githubUrl ? (
+                    <div className="mt-auto pt-6">
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+                      >
+                        <FaGithub /> View GitHub
+                      </a>
+                    </div>
+                  ) : null}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <main className="relative z-10 mx-auto max-w-5xl px-4 pb-20 sm:px-6">
         <section id="contact" className="reveal-item rounded-3xl bg-brand-900 p-10 text-white">
           <SectionTitle eyebrow="Contact" title="Let's work together" inverse />
           <p className="max-w-2xl text-brand-100">

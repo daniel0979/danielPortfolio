@@ -46,6 +46,14 @@
 - [x] Reduced-motion handling for new animations
 - [x] Build verification
 
+## Larger Project Cards (round 5)
+- [x] Move projects section to wider max-w-7xl container
+- [x] Larger card padding (p-6 md:p-8) and gap (gap-6 xl:gap-8)
+- [x] Taller preview images (h-52 sm:h-64)
+- [x] Bigger titles (text-2xl) and description (text-base)
+- [x] Larger GitHub buttons (px-5 py-2.5 text-sm)
+- [x] Build verification
+
 ## Follow-up
 - [x] Preview with npm run dev
 - [x] Build verification
