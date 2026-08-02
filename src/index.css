@@ -544,35 +544,10 @@ html.dark .mobile-nav-link:hover {
   transform-style: preserve-3d;
 }
 
-.particle {
-  position: absolute;
-  border-radius: 9999px;
-  background: rgba(34, 211, 238, 0.55);
-  box-shadow: 0 0 8px rgba(34, 211, 238, 0.6);
-  animation: particle-float 9s ease-in-out infinite;
-}
-
-@keyframes particle-float {
-  0%,
-  100% {
-    transform: translateY(0) translateX(0) scale(1);
-    opacity: 0.35;
-  }
-  50% {
-    transform: translateY(-28px) translateX(10px) scale(1.25);
-    opacity: 0.85;
-  }
-}
-
-html.dark .particle {
-  background: rgba(34, 211, 238, 0.45);
-  box-shadow: 0 0 8px rgba(103, 232, 249, 0.5);
-}
-
 .hero-glow {
-  background: linear-gradient(120deg, #22d3ee, #6366f1, #a855f7, #ec4899, #22d3ee);
+  background: linear-gradient(120deg, rgba(99, 102, 241, 0.5), rgba(34, 211, 238, 0.4), rgba(129, 140, 248, 0.5));
   background-size: 300% 300%;
-  animation: hero-glow-shift 6s ease infinite;
+  animation: hero-glow-shift 8s ease infinite;
 }
 
 @keyframes hero-glow-shift {
@@ -627,7 +602,6 @@ html.dark .particle {
   .footer-glow::after,
   .typewriter-caret,
   .marquee-track,
-  .particle,
   .hero-glow,
   .section-underline {
     animation: none !important;

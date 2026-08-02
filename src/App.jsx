@@ -887,35 +887,50 @@ function App() {
           </div>
           <div
             ref={heroCardRef}
-            className="tilt-card hero-float relative rounded-3xl bg-white p-6 shadow-xl ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700"
+            className="tilt-card hero-float group relative rounded-[1.75rem] bg-white/90 p-2 shadow-[0_20px_60px_-15px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/80 backdrop-blur dark:bg-slate-900/85 dark:ring-slate-700/80"
             onMouseMove={(event) => handleTiltMove(event, heroCardRef)}
             onMouseLeave={() => handleTiltLeave(heroCardRef)}
           >
-            <span className="hero-glow absolute -inset-px -z-10 rounded-3xl opacity-60 blur-[2px]" aria-hidden="true" />
-            <span className="particle left-8 top-6 h-2 w-2" aria-hidden="true" />
-            <span className="particle right-10 top-16 h-1.5 w-1.5" style={{ animationDelay: '-3s' }} aria-hidden="true" />
-            <span className="particle bottom-16 left-12 h-2.5 w-2.5" style={{ animationDelay: '-6s' }} aria-hidden="true" />
-            <span className="particle right-8 bottom-8 h-1.5 w-1.5" style={{ animationDelay: '-1.5s' }} aria-hidden="true" />
-            <img
-              src="/images/profile.jpg"
-              alt="Aung Khant Min profile"
-              className="portrait-breathe h-80 w-full rounded-2xl object-cover object-[center_25%] ring-1 ring-slate-200 dark:ring-slate-700"
-            />
-            <p className="mt-4 text-lg font-bold text-slate-900 dark:text-white">Aung Khant Min</p>
-            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-              <span className="typewriter-text">
-                {typewriterText}
-                <span className="typewriter-caret" aria-hidden="true" />
+            <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.75rem]">
+              <div className="absolute -left-20 -top-24 h-48 w-48 rounded-full bg-indigo-400/15 blur-3xl transition-opacity duration-700 group-hover:opacity-100 dark:bg-indigo-500/15" />
+              <div className="absolute -bottom-20 -right-16 h-44 w-44 rounded-full bg-cyan-400/15 blur-3xl transition-opacity duration-700 group-hover:opacity-100 dark:bg-cyan-500/15" />
+            </div>
+            <div className="relative overflow-hidden rounded-[1.4rem] bg-gradient-to-br from-slate-100 via-white to-slate-50 p-6 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800/60">
+              <span className="absolute right-6 top-6 inline-flex items-center gap-1.5 rounded-full border border-emerald-200/70 bg-emerald-50/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-600 dark:border-emerald-800/70 dark:bg-emerald-950/60 dark:text-emerald-300">
+                <span className="scroll-dot h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                Available
               </span>
-            </p>
-            <ul className="mt-4 grid grid-cols-2 gap-2 text-sm text-slate-700 dark:text-slate-200">
-              {coreStack.map(({ name, Icon, iconClass }) => (
-                <li key={name} className="inline-flex items-center gap-2 rounded-lg bg-slate-50 px-2.5 py-1.5 dark:bg-slate-800/70">
-                  <Icon className={iconClass} />
-                  <span>{name}</span>
-                </li>
-              ))}
-            </ul>
+              <img
+                src="/images/profile.jpg"
+                alt="Aung Khant Min profile"
+                className="portrait-breathe h-80 w-full rounded-2xl object-cover object-[center_25%] ring-1 ring-white shadow-[0_18px_40px_-20px_rgba(15,23,42,0.45)] dark:ring-slate-700"
+              />
+              <div className="mt-5 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-lg font-bold text-slate-900 dark:text-white">Aung Khant Min</p>
+                  <p className="mt-0.5 text-sm text-slate-600 dark:text-slate-300">
+                    <span className="typewriter-text">
+                      {typewriterText}
+                      <span className="typewriter-caret" aria-hidden="true" />
+                    </span>
+                  </p>
+                </div>
+                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-500 text-white shadow-lg shadow-indigo-500/25">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path d="M20 6 9.5 16.5 4 11" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </div>
+              <div className="mt-4 h-px w-full bg-gradient-to-r from-transparent via-slate-300/70 to-transparent dark:via-slate-700" />
+              <ul className="mt-4 grid grid-cols-2 gap-2 text-sm text-slate-700 dark:text-slate-200">
+                {coreStack.slice(0, 8).map(({ name, Icon, iconClass }) => (
+                  <li key={name} className="inline-flex items-center gap-2 rounded-lg bg-white/80 px-2.5 py-1.5 ring-1 ring-slate-200/70 dark:bg-slate-800/70 dark:ring-slate-700/60">
+                    <Icon className={iconClass} />
+                    <span className="truncate">{name}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </header>
