@@ -85,6 +85,35 @@ function RevealText({ text, className, as: Tag = 'p', step = 35 }) {
   )
 }
 
+function useScrollReveal() {
+  const rootRef = useRef(null)
+
+  useEffect(() => {
+    const root = rootRef.current
+    if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const items = root.querySelectorAll('.reveal-item')
+    if (items.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('reveal-item-visible')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+    )
+
+    items.forEach((item) => observer.observe(item))
+    return () => observer.disconnect()
+  }, [])
+
+  return rootRef
+}
+
 function useCountUp(target, { duration = 1400, start = 0, shouldStart = true } = {}) {
   const [value, setValue] = useState(start)
 
@@ -194,8 +223,11 @@ function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('')
   const [sparkles, setSparkles] = useState([])
+  const [showIntro, setShowIntro] = useState(true)
+  const [introDone, setIntroDone] = useState(false)
   const heroCardRef = useRef(null)
   const cursorGlowRef = useRef(null)
+  const mainRevealRef = useScrollReveal()
   const projectSliderCardRefs = useRef([])
   const projectSliderViewportRef = useRef(null)
   const projectSliderDragStateRef = useRef({
@@ -555,6 +587,21 @@ function App() {
   }, [])
 
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setShowIntro(false)
+      setIntroDone(true)
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      setShowIntro(false)
+      setIntroDone(true)
+    }, 3650)
+
+    return () => window.clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
     if (contactFormStatus.type !== 'success') return
 
     const hideMessageTimer = window.setTimeout(() => {
@@ -752,6 +799,23 @@ function App() {
         className="pointer-events-none fixed left-0 top-0 z-[1] hidden h-[400px] w-[400px] rounded-full bg-brand-500/10 blur-3xl dark:bg-cyan-400/10 md:block"
         aria-hidden="true"
       />
+      {showIntro || !introDone ? (
+        <div className="intro-overlay" aria-hidden="true" style={{ pointerEvents: showIntro ? 'auto' : 'none' }}>
+          <div className="intro-panel-top" />
+          <div className="intro-panel-bottom" />
+          <div className="intro-center">
+            <div className="intro-name">
+              {'AUNG KHANT MIN'.split('').map((char, index) => (
+                <span key={`${char}-${index}`} style={{ animationDelay: `${0.18 + index * 0.055}s` }}>
+                  {char === ' ' ? '\u00A0' : char}
+                </span>
+              ))}
+            </div>
+            <p className="intro-tagline">Full Stack Developer</p>
+          </div>
+        </div>
+      ) : null}
+
       <div className="fixed left-0 top-0 z-[60] h-1.5 w-full bg-slate-200/60 backdrop-blur dark:bg-slate-800/70">
         <div
           className="h-full bg-gradient-to-r from-cyan-500 via-brand-500 to-indigo-600 shadow-[0_0_18px_rgba(47,109,246,0.6)] transition-[width] duration-150"
@@ -1082,8 +1146,8 @@ function App() {
         </div>
       </div>
 
-      <main className="relative z-10 mx-auto max-w-5xl space-y-20 px-4 pb-20 sm:px-6">
-        <section id="about">
+      <main ref={mainRevealRef} className="relative z-10 mx-auto max-w-5xl space-y-20 px-4 pb-20 sm:px-6">
+        <section id="about" className="reveal-item">
           <SectionTitle eyebrow="About" title="A quick introduction" />
           <RevealText
             text="I am a Full Stack Developer with 6+ months of hands-on experience, turning ideas into polished, scalable web and mobile experiences. I work with HTML, CSS, Tailwind CSS, JavaScript, React, React Native, PHP, Laravel, WordPress, Kotlin, and databases like MySQL, MongoDB, and PostgreSQL to build smooth user experiences and reliable backend systems."
@@ -1092,7 +1156,7 @@ function App() {
           />
         </section>
 
-        <section id="skills">
+        <section id="skills" className="reveal-item">
           <SectionTitle eyebrow="Skills" title="Skill range and delivery details" />
           <div className="grid gap-6 lg:grid-cols-[1.15fr_1fr]">
             <div
@@ -1194,7 +1258,7 @@ function App() {
           </div>
         </section>
 
-        <section id="education">
+        <section id="education" className="reveal-item">
           <SectionTitle eyebrow="Education" title="Academic background" />
           <div className="relative space-y-8 pl-8">
             <div className="absolute bottom-3 left-[11px] top-3 w-0.5 bg-gradient-to-b from-brand-300 via-brand-500 to-brand-700 dark:from-brand-800 dark:via-brand-600 dark:to-brand-300" />
@@ -1236,7 +1300,7 @@ function App() {
           </div>
         </section>
 
-        <section id="projects">
+        <section id="projects" className="reveal-item">
           <SectionTitle eyebrow="Portfolio" title="Featured projects" />
           <div className="relative overflow-hidden rounded-3xl border border-white/50 bg-white/70 p-4 shadow-2xl shadow-brand-500/10 ring-1 ring-slate-200 backdrop-blur dark:border-slate-700 dark:bg-slate-900/70 dark:ring-slate-700 md:p-6">
             <div className="pointer-events-none absolute -left-24 -top-20 h-52 w-52 rounded-full bg-brand-400/20 blur-3xl" />
@@ -1352,7 +1416,7 @@ function App() {
           </div>
         </section>
 
-        <section id="contact" className="rounded-3xl bg-brand-900 p-10 text-white">
+        <section id="contact" className="reveal-item rounded-3xl bg-brand-900 p-10 text-white">
           <SectionTitle eyebrow="Contact" title="Let's work together" inverse />
           <p className="max-w-2xl text-brand-100">
             Looking for a frontend developer for your next project? Send a message and tell me about your goals.
