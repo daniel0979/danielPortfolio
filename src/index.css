@@ -573,6 +573,98 @@ html.dark .mobile-nav-link:hover {
   }
 }
 
+/* Interactive magnetic buttons */
+[data-magnetic] {
+  will-change: transform;
+}
+
+/* Smooth 3D tilt targets */
+.tilt-target {
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+/* Active navigation highlight */
+.nav-link-pill.nav-link-pill-active {
+  border-color: rgba(47, 109, 246, 0.6);
+  color: rgb(30, 58, 138);
+  box-shadow: 0 10px 28px rgba(47, 109, 246, 0.2);
+}
+
+.nav-link-pill.nav-link-pill-active::before {
+  opacity: 1;
+}
+
+html.dark .nav-link-pill.nav-link-pill-active {
+  border-color: rgba(125, 211, 252, 0.75);
+  color: rgb(224, 242, 254);
+  box-shadow: 0 12px 28px rgba(56, 189, 248, 0.28);
+}
+
+/* Gradient name shimmer */
+.hero-name-gradient {
+  background-size: 220% auto;
+  animation: hero-name-shimmer 6s linear infinite;
+}
+
+@keyframes hero-name-shimmer {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 220% center;
+  }
+}
+
+/* Rotating "hire me" badge */
+.rotating-badge {
+  position: relative;
+  display: grid;
+  height: 7rem;
+  width: 7rem;
+  place-items: center;
+}
+
+.rotating-badge > svg {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  animation: rotate-badge 16s linear infinite;
+}
+
+.rotating-badge > span {
+  position: relative;
+}
+
+@keyframes rotate-badge {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Click sparkle burst */
+.click-sparkle {
+  position: fixed;
+  z-index: 120;
+  height: 7px;
+  width: 7px;
+  border-radius: 9999px;
+  pointer-events: none;
+  animation: sparkle-pop 760ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes sparkle-pop {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--sparkle-x, 0px), var(--sparkle-y, 0px)) scale(0);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     scroll-behavior: auto;
@@ -603,12 +695,20 @@ html.dark .mobile-nav-link:hover {
   .typewriter-caret,
   .marquee-track,
   .hero-glow,
-  .section-underline {
+  .section-underline,
+  .hero-name-gradient,
+  .rotating-badge > svg,
+  .click-sparkle {
     animation: none !important;
   }
 
-  .tilt-card {
+  .tilt-card,
+  .tilt-target {
     transform: none !important;
     transition: none !important;
+  }
+
+  [data-magnetic] {
+    transform: none !important;
   }
 }

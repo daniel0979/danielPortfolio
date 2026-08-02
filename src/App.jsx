@@ -192,8 +192,11 @@ function App() {
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('')
+  const [sparkles, setSparkles] = useState([])
   const heroCardRef = useRef(null)
   const cursorGlowRef = useRef(null)
+  const projectSliderCardRefs = useRef([])
   const projectSliderViewportRef = useRef(null)
   const projectSliderDragStateRef = useRef({
     pointerId: null,
@@ -388,6 +391,80 @@ function App() {
     node.style.setProperty('--tilt-x', '0deg')
     node.style.setProperty('--tilt-y', '0deg')
   }
+
+  const handleMagneticMove = (event) => {
+    const node = event.currentTarget
+    if (!node || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const rect = node.getBoundingClientRect()
+    const x = event.clientX - rect.left - rect.width / 2
+    const y = event.clientY - rect.top - rect.height / 2
+    node.style.transform = `translate(${x * 0.18}px, ${y * 0.22}px)`
+  }
+
+  const handleMagneticLeave = (event) => {
+    const node = event.currentTarget
+    if (!node) return
+    node.style.transform = ''
+  }
+
+  const handleProjectCardTiltMove = (event, index) => {
+    const node = projectSliderCardRefs.current[index]
+    if (!node || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const rect = node.getBoundingClientRect()
+    const x = (event.clientX - rect.left) / rect.width
+    const y = (event.clientY - rect.top) / rect.height
+    const rotateX = (0.5 - y) * 6
+    const rotateY = (x - 0.5) * 6
+    node.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`
+  }
+
+  const handleProjectCardTiltLeave = (event, index) => {
+    const node = projectSliderCardRefs.current[index]
+    if (!node) return
+    node.style.transform = ''
+  }
+
+  const spawnSparkles = (event) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const colors = ['#22d3ee', '#6366f1', '#a78bfa', '#f472b6', '#fbbf24', '#34d399']
+    const count = 8
+    const nextSparkles = Array.from({ length: count }, (_, index) => {
+      const angle = (index / count) * Math.PI * 2
+      const distance = 36 + Math.random() * 26
+      return {
+        id: `${Date.now()}-${index}`,
+        x: event.clientX,
+        y: event.clientY,
+        dx: Math.cos(angle) * distance,
+        dy: Math.sin(angle) * distance,
+        color: colors[index % colors.length],
+        size: 5 + Math.random() * 5,
+      }
+    })
+    setSparkles((current) => [...current, ...nextSparkles])
+    window.setTimeout(() => {
+      setSparkles((current) => current.filter((sparkle) => !nextSparkles.some((s) => s.id === sparkle.id)))
+    }, 800)
+  }
+
+  useEffect(() => {
+    const handleSectionSpy = () => {
+      const sectionIds = ['about', 'skills', 'education', 'projects', 'contact']
+      let current = ''
+      for (const id of sectionIds) {
+        const element = document.getElementById(id)
+        if (!element) continue
+        if (window.scrollY >= element.offsetTop - 140) {
+          current = id
+        }
+      }
+      setActiveSection(current)
+    }
+
+    window.addEventListener('scroll', handleSectionSpy, { passive: true })
+    handleSectionSpy()
+    return () => window.removeEventListener('scroll', handleSectionSpy)
+  }, [])
 
   useEffect(() => {
     const glowNode = cursorGlowRef.current
@@ -795,11 +872,23 @@ function App() {
           </div>
 
           <div className="mt-4 hidden flex-wrap items-center gap-2 text-sm font-medium md:flex">
-            {navLinks.map((link) => (
-              <a key={link.href} href={link.href} className="nav-link-pill">
-                <span className="relative z-[1]">{link.label}</span>
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const sectionId = link.href.replace('#', '')
+              const isActive = activeSection === sectionId
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  data-magnetic
+                  onMouseMove={handleMagneticMove}
+                  onMouseLeave={handleMagneticLeave}
+                  className={`nav-link-pill ${isActive ? 'nav-link-pill-active' : ''}`}
+                  aria-current={isActive ? 'true' : undefined}
+                >
+                  <span className="relative z-[1]">{link.label}</span>
+                </a>
+              )
+            })}
           </div>
 
           <div
@@ -843,6 +932,11 @@ function App() {
               className="mt-4 text-4xl font-extrabold leading-tight text-slate-900 dark:text-white md:text-6xl"
               step={55}
             />
+            <p className="mt-1 text-xl font-extrabold sm:text-2xl">
+              <span className="hero-name-gradient bg-gradient-to-r from-brand-600 via-cyan-500 to-fuchsia-500 bg-clip-text text-transparent">
+                I turn ideas into reality
+              </span>
+            </p>
             <RevealText
               text="I build clean and scalable web applications, from frontend interfaces to backend logic."
               className="mt-6 max-w-xl text-lg text-slate-600 dark:text-slate-300"
@@ -862,19 +956,33 @@ function App() {
             <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href="#projects"
+                data-magnetic
+                onMouseMove={handleMagneticMove}
+                onMouseLeave={handleMagneticLeave}
+                onClick={spawnSparkles}
                 className="w-full rounded-full bg-slate-900 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto"
               >
                 View Projects
               </a>
               <button
                 type="button"
-                onClick={() => setShowCvPreview(true)}
+                data-magnetic
+                onMouseMove={handleMagneticMove}
+                onMouseLeave={handleMagneticLeave}
+                onClick={(event) => {
+                  setShowCvPreview(true)
+                  spawnSparkles(event)
+                }}
                 className="w-full rounded-full bg-gradient-to-r from-brand-500 to-cyan-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-500/30 transition hover:scale-[1.02] hover:from-brand-600 hover:to-cyan-600 sm:w-auto"
               >
                 Download CV
               </button>
               <a
                 href="#contact"
+                data-magnetic
+                onMouseMove={handleMagneticMove}
+                onMouseLeave={handleMagneticLeave}
+                onClick={spawnSparkles}
                 className="w-full rounded-full border border-slate-300 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-brand-100 dark:hover:text-brand-100 sm:w-auto"
               >
                 Contact Me
@@ -931,6 +1039,29 @@ function App() {
                 ))}
               </ul>
             </div>
+            <a
+              href="#contact"
+              className="rotating-badge group absolute -right-3 -top-6 z-10 sm:-right-6"
+              aria-label="Hire me"
+              onClick={spawnSparkles}
+            >
+              <svg viewBox="0 0 100 100">
+                <defs>
+                  <path id="badge-circle" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0" />
+                </defs>
+                <text
+                  className="fill-slate-800 text-[11px] font-bold uppercase tracking-[0.28em] dark:fill-slate-100"
+                  style={{ letterSpacing: '0.3em' }}
+                >
+                  <textPath href="#badge-circle">• Hire Me • Open To Work</textPath>
+                </text>
+              </svg>
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-cyan-500 text-white shadow-lg shadow-brand-500/30 transition-transform duration-300 group-hover:scale-110">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M13 2 3.5 13.5H11L9.5 22 20 10.5h-7.5L13 2Z" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+            </a>
           </div>
         </div>
       </header>
@@ -1155,9 +1286,16 @@ function App() {
                 className={`flex ${isDraggingProjectSlider ? '' : 'transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]'}`}
                 style={{ transform: `translate3d(calc(-${activeProject * 100}% + ${projectDragOffset}px), 0, 0)` }}
               >
-                {projects.map((project) => (
+                {projects.map((project, index) => (
                   <article key={project.name} className="w-full shrink-0 px-1">
-                    <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-lg shadow-slate-900/5 ring-1 ring-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:ring-slate-700 md:p-7">
+                    <div
+                      ref={(node) => {
+                        projectSliderCardRefs.current[index] = node
+                      }}
+                      className="tilt-target rounded-2xl border border-slate-200/80 bg-white p-5 shadow-lg shadow-slate-900/5 ring-1 ring-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:ring-slate-700 md:p-7"
+                      onMouseMove={(event) => handleProjectCardTiltMove(event, index)}
+                      onMouseLeave={(event) => handleProjectCardTiltLeave(event, index)}
+                    >
                       <div className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-brand-500 to-cyan-500 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white">
                         Featured Work
                       </div>
@@ -1433,6 +1571,24 @@ function App() {
           </section>
         </div>
       </footer>
+
+      {sparkles.map((sparkle) => (
+        <span
+          key={sparkle.id}
+          className="click-sparkle"
+          style={{
+            left: sparkle.x,
+            top: sparkle.y,
+            background: sparkle.color,
+            boxShadow: `0 0 10px ${sparkle.color}`,
+            width: sparkle.size,
+            height: sparkle.size,
+            '--sparkle-x': `${sparkle.dx}px`,
+            '--sparkle-y': `${sparkle.dy}px`,
+          }}
+          aria-hidden="true"
+        />
+      ))}
 
       {showScrollTop ? (
         <button
