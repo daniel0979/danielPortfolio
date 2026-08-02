@@ -36,6 +36,16 @@
 - [x] Scroll-reveal system for sections (about, skills, education, projects, contact)
 - [x] Reduced-motion support for intro + reveals
 
+## Projects Grid + Footer CTA (round 4)
+- [x] Remove horizontal slider (state, refs, drag handlers, auto-advance)
+- [x] Replace slider with 2-per-row responsive grid
+- [x] Grid card tilt on hover retained
+- [x] GitHub hover overlay on project preview images
+- [x] "Hit Me Up" footer banner with small profile image
+- [x] Floating avatar + spinning conic glow animation
+- [x] Reduced-motion handling for new animations
+- [x] Build verification
+
 ## Follow-up
 - [x] Preview with npm run dev
 - [x] Build verification

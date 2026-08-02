@@ -205,10 +205,6 @@ function App() {
   const [theme, setTheme] = useState('light')
   const [selectedMarks, setSelectedMarks] = useState(null)
   const [showCvPreview, setShowCvPreview] = useState(false)
-  const [activeProject, setActiveProject] = useState(0)
-  const [isProjectSliderHovered, setIsProjectSliderHovered] = useState(false)
-  const [isDraggingProjectSlider, setIsDraggingProjectSlider] = useState(false)
-  const [projectDragOffset, setProjectDragOffset] = useState(0)
   const [showContactForm, setShowContactForm] = useState(false)
   const [contactFormData, setContactFormData] = useState({
     name: '',
@@ -228,16 +224,7 @@ function App() {
   const heroCardRef = useRef(null)
   const cursorGlowRef = useRef(null)
   const mainRevealRef = useScrollReveal()
-  const projectSliderCardRefs = useRef([])
-  const projectSliderViewportRef = useRef(null)
-  const projectSliderDragStateRef = useRef({
-    pointerId: null,
-    startX: 0,
-    startY: 0,
-    deltaX: 0,
-    width: 0,
-    isHorizontalDrag: false,
-  })
+  const projectCardRefs = useRef([])
   const coreStack = [
     { name: 'HTML', Icon: FaHtml5, iconClass: 'text-orange-500' },
     { name: 'CSS', Icon: FaCss3Alt, iconClass: 'text-blue-500' },
@@ -440,7 +427,7 @@ function App() {
   }
 
   const handleProjectCardTiltMove = (event, index) => {
-    const node = projectSliderCardRefs.current[index]
+    const node = projectCardRefs.current[index]
     if (!node || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const rect = node.getBoundingClientRect()
     const x = (event.clientX - rect.left) / rect.width
@@ -451,7 +438,7 @@ function App() {
   }
 
   const handleProjectCardTiltLeave = (event, index) => {
-    const node = projectSliderCardRefs.current[index]
+    const node = projectCardRefs.current[index]
     if (!node) return
     node.style.transform = ''
   }
@@ -552,16 +539,6 @@ function App() {
   }, [selectedMarks, showCvPreview])
 
   useEffect(() => {
-    if (projects.length < 2 || isProjectSliderHovered || isDraggingProjectSlider) return
-
-    const slider = setInterval(() => {
-      setActiveProject((current) => (current + 1) % projects.length)
-    }, 8000)
-
-    return () => clearInterval(slider)
-  }, [isProjectSliderHovered, isDraggingProjectSlider])
-
-  useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 420)
       const scrollTop = window.scrollY
@@ -633,90 +610,6 @@ function App() {
       detail: 'Completing final-year studies with focus on advanced computing topics and real-world development.',
     },
   ]
-
-  const goToPreviousProject = () => {
-    setActiveProject((current) => (current - 1 + projects.length) % projects.length)
-  }
-
-  const goToNextProject = () => {
-    setActiveProject((current) => (current + 1) % projects.length)
-  }
-
-  const resetProjectSliderDrag = () => {
-    projectSliderDragStateRef.current = {
-      pointerId: null,
-      startX: 0,
-      startY: 0,
-      deltaX: 0,
-      width: 0,
-      isHorizontalDrag: false,
-    }
-    setProjectDragOffset(0)
-    setIsDraggingProjectSlider(false)
-  }
-
-  const handleProjectSliderPointerDown = (event) => {
-    if (event.pointerType === 'mouse' && event.button !== 0) return
-
-    const viewport = projectSliderViewportRef.current
-    if (!viewport) return
-
-    projectSliderDragStateRef.current = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      deltaX: 0,
-      width: viewport.clientWidth,
-      isHorizontalDrag: false,
-    }
-    event.currentTarget.setPointerCapture(event.pointerId)
-    setIsDraggingProjectSlider(true)
-  }
-
-  const handleProjectSliderPointerMove = (event) => {
-    const dragState = projectSliderDragStateRef.current
-    if (dragState.pointerId !== event.pointerId) return
-
-    const deltaX = event.clientX - dragState.startX
-    const deltaY = event.clientY - dragState.startY
-
-    if (!dragState.isHorizontalDrag) {
-      if (Math.abs(deltaX) < 8 && Math.abs(deltaY) < 8) return
-      if (Math.abs(deltaY) > Math.abs(deltaX)) {
-        resetProjectSliderDrag()
-        return
-      }
-      dragState.isHorizontalDrag = true
-    }
-
-    const maxDrag = dragState.width * 0.3
-    const limitedOffset = Math.max(-maxDrag, Math.min(maxDrag, deltaX))
-
-    dragState.deltaX = limitedOffset
-    setProjectDragOffset(limitedOffset)
-  }
-
-  const handleProjectSliderPointerEnd = (event) => {
-    const dragState = projectSliderDragStateRef.current
-    if (dragState.pointerId !== event.pointerId) return
-
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId)
-    }
-
-    const swipeDistance = dragState.deltaX
-    const swipeThreshold = Math.min(150, dragState.width * 0.16)
-
-    if (Math.abs(swipeDistance) >= swipeThreshold) {
-      if (swipeDistance < 0) {
-        goToNextProject()
-      } else {
-        goToPreviousProject()
-      }
-    }
-
-    resetProjectSliderDrag()
-  }
 
   const handleContactInputChange = (event) => {
     const { name, value } = event.target
@@ -1308,109 +1201,75 @@ function App() {
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-500 dark:text-brand-200">
-                  Slide Showcase
+                  Project Showcase
                 </p>
                 <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                   {totalProjects} projects created using {uniqueStackCount} technologies.
                 </p>
               </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={goToPreviousProject}
-                  className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
-                >
-                  Prev
-                </button>
-                <button
-                  type="button"
-                  onClick={goToNextProject}
-                  className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
-                >
-                  Next
-                </button>
-              </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-2xl border border-transparent bg-gradient-to-r from-brand-500/60 via-cyan-400/60 to-brand-500/60 p-[1.5px]">
-              <div
-                ref={projectSliderViewportRef}
-                className={`overflow-hidden rounded-2xl bg-white/90 dark:bg-slate-950/95 ${
-                  isDraggingProjectSlider ? 'cursor-grabbing select-none' : 'cursor-grab'
-                }`}
-                style={{ touchAction: 'pan-y' }}
-                onMouseEnter={() => setIsProjectSliderHovered(true)}
-                onMouseLeave={() => setIsProjectSliderHovered(false)}
-                onPointerDown={handleProjectSliderPointerDown}
-                onPointerMove={handleProjectSliderPointerMove}
-                onPointerUp={handleProjectSliderPointerEnd}
-                onPointerCancel={handleProjectSliderPointerEnd}
-              >
-              <div
-                className={`flex ${isDraggingProjectSlider ? '' : 'transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]'}`}
-                style={{ transform: `translate3d(calc(-${activeProject * 100}% + ${projectDragOffset}px), 0, 0)` }}
-              >
-                {projects.map((project, index) => (
-                  <article key={project.name} className="w-full shrink-0 px-1">
-                    <div
-                      ref={(node) => {
-                        projectSliderCardRefs.current[index] = node
-                      }}
-                      className="tilt-target rounded-2xl border border-slate-200/80 bg-white p-5 shadow-lg shadow-slate-900/5 ring-1 ring-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:ring-slate-700 md:p-7"
-                      onMouseMove={(event) => handleProjectCardTiltMove(event, index)}
-                      onMouseLeave={(event) => handleProjectCardTiltLeave(event, index)}
-                    >
-                      <div className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-brand-500 to-cyan-500 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white">
-                        Featured Work
-                      </div>
-                      {project.featured && !project.imagePath ? <VoguzPreview /> : null}
-                      {project.imagePath ? (
-                        <div className="mb-5 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950">
-                          <img src={project.imagePath} alt={`${project.name} preview`} className="h-48 w-full object-cover object-top sm:h-56" />
-                        </div>
-                      ) : null}
-                      <h3 className="text-xl font-bold text-slate-900 dark:text-white">{project.name}</h3>
-                      <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-300">{project.description}</p>
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {project.stack.map((item) => (
-                          <span
-                            key={item}
-                            className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-600 dark:bg-brand-900/60 dark:text-brand-100"
-                          >
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                      {project.githubUrl ? (
+            <div className="grid gap-5 md:grid-cols-2">
+              {projects.map((project, index) => (
+                <article key={project.name} className="relative">
+                  <div
+                    ref={(node) => {
+                      projectCardRefs.current[index] = node
+                    }}
+                    className="tilt-target flex h-full flex-col rounded-2xl border border-slate-200/80 bg-white p-5 shadow-lg shadow-slate-900/5 ring-1 ring-slate-100 transition-shadow duration-300 hover:shadow-xl hover:shadow-brand-500/10 dark:border-slate-700 dark:bg-slate-900 dark:ring-slate-700 md:p-6"
+                    onMouseMove={(event) => handleProjectCardTiltMove(event, index)}
+                    onMouseLeave={(event) => handleProjectCardTiltLeave(event, index)}
+                  >
+                    <div className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-brand-500 to-cyan-500 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white">
+                      Project {String(index + 1).padStart(2, '0')}
+                    </div>
+                    {project.featured && !project.imagePath ? <VoguzPreview /> : null}
+                    {project.imagePath ? (
+                      <div className="group relative mb-5 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950">
+                        <img
+                          src={project.imagePath}
+                          alt={`${project.name} preview`}
+                          className="h-44 w-full object-cover object-top transition-transform duration-500 group-hover:scale-105 sm:h-48"
+                        />
                         <a
                           href={project.githubUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="mt-6 inline-flex items-center rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+                          className="absolute inset-0 flex items-center justify-center bg-slate-900/0 opacity-0 transition-all duration-300 group-hover:bg-slate-900/55 group-hover:opacity-100"
+                          aria-label={`View ${project.name} on GitHub`}
                         >
-                          View GitHub
+                          <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-slate-900 shadow-lg">
+                            <FaGithub /> View GitHub
+                          </span>
                         </a>
-                      ) : null}
+                      </div>
+                    ) : null}
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">{project.name}</h3>
+                    <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">{project.description}</p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {project.stack.map((item) => (
+                        <span
+                          key={item}
+                          className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-600 dark:bg-brand-900/60 dark:text-brand-100"
+                        >
+                          {item}
+                        </span>
+                      ))}
                     </div>
-                  </article>
-                ))}
-              </div>
-              </div>
-            </div>
-
-            <div className="mt-5 flex items-center justify-center gap-2">
-              {projects.map((project, index) => (
-                <button
-                  key={project.name}
-                  type="button"
-                  onClick={() => setActiveProject(index)}
-                  className={`h-2.5 rounded-full transition-all ${
-                    index === activeProject
-                      ? 'w-8 bg-gradient-to-r from-brand-500 to-cyan-500 dark:from-brand-300 dark:to-cyan-300'
-                      : 'w-2.5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-600 dark:hover:bg-slate-500'
-                  }`}
-                  aria-label={`Go to ${project.name}`}
-                />
+                    {project.githubUrl ? (
+                      <div className="mt-auto pt-6">
+                        <a
+                          href={project.githubUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+                        >
+                          <FaGithub /> View GitHub
+                        </a>
+                      </div>
+                    ) : null}
+                  </div>
+                </article>
               ))}
             </div>
           </div>
@@ -1612,6 +1471,36 @@ function App() {
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
                   Yes. I&apos;m available for freelance projects and focused consulting sessions.
                 </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="hit-me-up rounded-3xl bg-gradient-to-r from-brand-900 via-slate-900 to-cyan-900 p-8 ring-1 ring-white/10">
+            <div className="flex flex-col items-center gap-6 md:flex-row md:gap-8">
+              <div className="relative shrink-0">
+                <span className="absolute -inset-2 rounded-full bg-gradient-to-br from-brand-400/50 to-cyan-400/50 blur-lg" aria-hidden="true" />
+                <img
+                  src="/images/profile.jpg"
+                  alt="Aung Khant Min"
+                  className="hit-me-avatar relative h-24 w-24 rounded-full object-cover object-[center_25%] ring-4 ring-white/90 shadow-2xl dark:ring-slate-800"
+                />
+                <span className="absolute bottom-1 right-1 h-5 w-5 rounded-full border-4 border-brand-900 bg-emerald-400 dark:border-slate-900" />
+              </div>
+              <div className="text-center md:text-left">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">Hit Me Up</p>
+                <h3 className="mt-1 text-2xl font-extrabold text-white">Let&apos;s build something great together</h3>
+                <p className="mt-2 max-w-xl text-sm leading-6 text-brand-100/80">
+                  I&apos;m currently open to freelance projects and full-time opportunities. Send a message and let&apos;s talk about your idea.
+                </p>
+                <a
+                  href="#contact"
+                  className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-brand-900 shadow-lg transition hover:scale-[1.03] hover:bg-brand-100"
+                >
+                  Get in Touch
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+                    <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </a>
               </div>
             </div>
           </section>

@@ -809,6 +809,49 @@ html.dark .nav-link-pill.nav-link-pill-active {
   }
 }
 
+/* ---- Hit me up footer banner ---- */
+.hit-me-up {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hit-me-up::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  z-index: -1;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(34, 211, 238, 0.22) 70deg,
+    transparent 140deg,
+    rgba(129, 140, 248, 0.22) 210deg,
+    transparent 280deg
+  );
+  animation: hit-me-spin 12s linear infinite;
+}
+
+@keyframes hit-me-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.hit-me-up .hit-me-avatar {
+  animation: hit-me-float 5s ease-in-out infinite;
+}
+
+@keyframes hit-me-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
 /* ---- Scroll reveal system ---- */
 .reveal-item {
   opacity: 0;
@@ -858,6 +901,8 @@ html.dark .nav-link-pill.nav-link-pill-active {
   .hero-name-gradient,
   .rotating-badge > svg,
   .click-sparkle,
+  .hit-me-up::before,
+  .hit-me-up .hit-me-avatar,
   .intro-overlay,
   .intro-name,
   .intro-name span,
