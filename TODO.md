@@ -54,8 +54,18 @@
 - [x] Larger GitHub buttons (px-5 py-2.5 text-sm)
 - [x] Build verification
 
+## Even Larger Project Cards (round 6)
+- [x] Expand container to full-width max-w-[90rem]
+- [x] Card padding increased to p-7 md:p-10
+- [x] Grid gap increased to xl:gap-10
+- [x] Images taller: h-64 sm:h-80
+- [x] Titles larger: text-3xl
+- [x] Descriptions larger: text-base md:text-lg, leading-8
+- [x] Tech badges larger, GitHub buttons bigger (px-6 py-3)
+- [x] Build verification
+
 ## Follow-up
 - [x] Preview with npm run dev
 - [x] Build verification
-- [ ] Commit and push to origin main
+- [x] Commit and push to origin main
 
