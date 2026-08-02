@@ -1275,6 +1275,46 @@ function App() {
               </article>
             ))}
           </div>
+
+          {/* Current project — full-screen feature */}
+          <div className="group relative mt-6 overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-950 shadow-2xl shadow-brand-500/10 dark:border-slate-700 xl:mt-8">
+            <img
+              src="/images/job-pj.png"
+              alt="Job Project — currently building"
+              className="h-[70vh] w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03] sm:h-[80vh] md:h-[85vh]"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/30 to-slate-950/20" />
+            <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-lg shadow-orange-500/30 sm:left-6 sm:top-6">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-white" />
+              </span>
+              Currently Building
+            </div>
+            <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10 md:p-12">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">
+                In Progress • Under Active Development
+              </p>
+              <h3 className="mt-3 text-4xl font-extrabold text-white md:text-5xl">Job Project</h3>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-200 md:text-lg">
+                A project I'm currently building — design, development, and features are still in active progress. Check back soon for updates.
+              </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <a
+                  href="https://github.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg transition hover:scale-[1.03] hover:bg-slate-100"
+                >
+                  <FaGithub /> View Progress
+                </a>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur">
+                  <span className="h-2 w-2 rounded-full bg-amber-400" />
+                  Status: Building
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

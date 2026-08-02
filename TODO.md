@@ -64,6 +64,14 @@
 - [x] Tech badges larger, GitHub buttons bigger (px-6 py-3)
 - [x] Build verification
 
+## Current Project Fullscreen Feature (round 7)
+- [x] Add job-pj.png full-screen banner under project grid
+- [x] Large hero-style image (h-[70vh] sm:h-[80vh] md:h-[85vh])
+- [x] "Currently Building" animated ping badge overlay
+- [x] Overlaid title, status, and "View Progress" CTA
+- [x] Hover zoom effect + dark gradient overlay
+- [x] Build verification
+
 ## Follow-up
 - [x] Preview with npm run dev
 - [x] Build verification
