@@ -490,6 +490,114 @@ html.dark .mobile-nav-link:hover {
   }
 }
 
+/* ---- Impressive new animations ---- */
+
+.typewriter-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.1em;
+  background: currentColor;
+  border-radius: 2px;
+  animation: caret-blink 0.9s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 14%, black 86%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 14%, black 86%, transparent);
+}
+
+.marquee-track {
+  animation: marquee-scroll 30s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.tilt-card {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  transform: perspective(900px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateZ(0);
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 9999px;
+  background: rgba(34, 211, 238, 0.55);
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.6);
+  animation: particle-float 9s ease-in-out infinite;
+}
+
+@keyframes particle-float {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-28px) translateX(10px) scale(1.25);
+    opacity: 0.85;
+  }
+}
+
+html.dark .particle {
+  background: rgba(34, 211, 238, 0.45);
+  box-shadow: 0 0 8px rgba(103, 232, 249, 0.5);
+}
+
+.hero-glow {
+  background: linear-gradient(120deg, #22d3ee, #6366f1, #a855f7, #ec4899, #22d3ee);
+  background-size: 300% 300%;
+  animation: hero-glow-shift 6s ease infinite;
+}
+
+@keyframes hero-glow-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.section-underline {
+  animation: section-underline-slide 3.2s linear infinite;
+}
+
+@keyframes section-underline-slide {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     scroll-behavior: auto;
@@ -516,7 +624,17 @@ html.dark .mobile-nav-link:hover {
   .mobile-nav-panel,
   .skill-fill::after,
   .footer-glow::before,
-  .footer-glow::after {
+  .footer-glow::after,
+  .typewriter-caret,
+  .marquee-track,
+  .particle,
+  .hero-glow,
+  .section-underline {
     animation: none !important;
+  }
+
+  .tilt-card {
+    transform: none !important;
+    transition: none !important;
   }
 }

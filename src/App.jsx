@@ -4,14 +4,37 @@ import {
   SiJavascript,
   SiKotlin,
   SiLaravel,
+  SiMongodb,
   SiMysql,
   SiNodedotjs,
   SiNextdotjs,
   SiPostgresql,
   SiTailwindcss,
+  SiWordpress,
 } from 'react-icons/si'
+import { TbBrandReactNative } from 'react-icons/tb'
 import SectionTitle from './components/SectionTitle'
 import projects from './data/projects'
+
+const typewriterRoles = ['Full Stack Developer', 'React Native Developer', 'WordPress & CMS Builder', 'Database Enthusiast']
+
+const marqueeItems = [
+  { name: 'HTML', Icon: FaHtml5, iconClass: 'text-orange-500' },
+  { name: 'CSS', Icon: FaCss3Alt, iconClass: 'text-blue-500' },
+  { name: 'Tailwind CSS', Icon: SiTailwindcss, iconClass: 'text-cyan-500' },
+  { name: 'JavaScript', Icon: SiJavascript, iconClass: 'text-yellow-400' },
+  { name: 'React', Icon: FaReact, iconClass: 'text-sky-500' },
+  { name: 'React Native', Icon: TbBrandReactNative, iconClass: 'text-sky-600' },
+  { name: 'PHP', Icon: FaPhp, iconClass: 'text-indigo-500' },
+  { name: 'Laravel', Icon: SiLaravel, iconClass: 'text-red-500' },
+  { name: 'WordPress', Icon: SiWordpress, iconClass: 'text-blue-600' },
+  { name: 'Kotlin', Icon: SiKotlin, iconClass: 'text-violet-500' },
+  { name: 'Node.js', Icon: SiNodedotjs, iconClass: 'text-emerald-500' },
+  { name: 'Next.js', Icon: SiNextdotjs, iconClass: 'text-slate-900 dark:text-slate-100' },
+  { name: 'MySQL', Icon: SiMysql, iconClass: 'text-blue-600' },
+  { name: 'MongoDB', Icon: SiMongodb, iconClass: 'text-green-500' },
+  { name: 'PostgreSQL', Icon: SiPostgresql, iconClass: 'text-sky-600' },
+]
 
 function useInView({ threshold = 0.2, rootMargin = '0px 0px -10% 0px', once = true } = {}) {
   const ref = useRef(null)
@@ -169,6 +192,8 @@ function App() {
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const heroCardRef = useRef(null)
+  const cursorGlowRef = useRef(null)
   const projectSliderViewportRef = useRef(null)
   const projectSliderDragStateRef = useRef({
     pointerId: null,
@@ -184,10 +209,14 @@ function App() {
     { name: 'Tailwind CSS', Icon: SiTailwindcss, iconClass: 'text-cyan-500' },
     { name: 'JavaScript', Icon: SiJavascript, iconClass: 'text-yellow-400' },
     { name: 'React', Icon: FaReact, iconClass: 'text-sky-500' },
+    { name: 'React Native', Icon: TbBrandReactNative, iconClass: 'text-sky-600' },
     { name: 'PHP', Icon: FaPhp, iconClass: 'text-indigo-500' },
     { name: 'Laravel', Icon: SiLaravel, iconClass: 'text-red-500' },
+    { name: 'WordPress', Icon: SiWordpress, iconClass: 'text-blue-600' },
     { name: 'Kotlin', Icon: SiKotlin, iconClass: 'text-violet-500' },
     { name: 'MySQL', Icon: SiMysql, iconClass: 'text-blue-600' },
+    { name: 'MongoDB', Icon: SiMongodb, iconClass: 'text-green-500' },
+    { name: 'PostgreSQL', Icon: SiPostgresql, iconClass: 'text-sky-600' },
   ]
   const navLinks = [
     { label: 'About', href: '#about' },
@@ -204,15 +233,27 @@ function App() {
       gradient: 'from-cyan-500 via-sky-500 to-indigo-500',
     },
     {
+      name: 'Mobile & React Native',
+      level: 78,
+      detail: 'Building cross-platform mobile experiences with React Native and reusable component patterns.',
+      gradient: 'from-sky-500 via-cyan-500 to-teal-500',
+    },
+    {
       name: 'Backend Development',
       level: 86,
-      detail: 'PHP and Laravel API/database workflows focused on practical production features.',
+      detail: 'PHP, Laravel, and Node.js API/database workflows focused on practical production features.',
       gradient: 'from-emerald-500 via-teal-500 to-cyan-500',
     },
     {
+      name: 'CMS & WordPress',
+      level: 80,
+      detail: 'WordPress theme development, content management, plugins, and site customization.',
+      gradient: 'from-blue-500 via-indigo-500 to-violet-500',
+    },
+    {
       name: 'Database Management',
-      level: 82,
-      detail: 'MySQL schema planning, data handling, and reliable CRUD operations.',
+      level: 84,
+      detail: 'MySQL, MongoDB, and PostgreSQL schema planning, data handling, and reliable CRUD operations.',
       gradient: 'from-blue-500 via-indigo-500 to-violet-500',
     },
     {
@@ -232,7 +273,10 @@ function App() {
     {
       category: 'Frontend',
       detail: 'Learning modern routing, hybrid rendering, and production patterns.',
-      tools: [{ name: 'Next.js', Icon: SiNextdotjs, iconClass: 'text-slate-900 dark:text-slate-100' }],
+      tools: [
+        { name: 'Next.js', Icon: SiNextdotjs, iconClass: 'text-slate-900 dark:text-slate-100' },
+        { name: 'React Native', Icon: TbBrandReactNative, iconClass: 'text-sky-600' },
+      ],
       gradient: 'from-slate-700 via-slate-800 to-slate-900',
     },
     {
@@ -247,7 +291,10 @@ function App() {
     {
       category: 'Database',
       detail: 'Studying relational schema design, indexing strategy, and query tuning.',
-      tools: [{ name: 'PostgreSQL', Icon: SiPostgresql, iconClass: 'text-sky-600' }],
+      tools: [
+        { name: 'PostgreSQL', Icon: SiPostgresql, iconClass: 'text-sky-600' },
+        { name: 'MongoDB', Icon: SiMongodb, iconClass: 'text-green-500' },
+      ],
       gradient: 'from-sky-500 via-blue-500 to-indigo-500',
     },
   ]
@@ -274,9 +321,103 @@ function App() {
       suffix: '+',
       detail: 'Project repositories available with code structure and implementation details.',
     },
+    {
+      label: 'Work Experience',
+      value: 6,
+      suffix: '+ Months',
+      detail: 'Real-world development experience shipping practical features for clients and teams.',
+    },
   ]
   const [skillsRangeRef, isSkillsRangeVisible] = useInView({ threshold: 0.24, rootMargin: '0px 0px -12% 0px' })
   const [learningTracksRef, isLearningTracksVisible] = useInView({ threshold: 0.2, rootMargin: '0px 0px -8% 0px' })
+
+  const [typewriterIndex, setTypewriterIndex] = useState(0)
+  const [typewriterText, setTypewriterText] = useState('')
+
+  useEffect(() => {
+    let interval = null
+    const role = typewriterRoles[typewriterIndex]
+    let charIndex = 0
+    let deleting = false
+
+    const tick = () => {
+      if (!deleting) {
+        charIndex += 1
+        setTypewriterText(role.slice(0, charIndex))
+        if (charIndex === role.length) {
+          deleting = true
+          clearInterval(interval)
+          interval = window.setInterval(tick, 1700)
+          return
+        }
+      } else {
+        charIndex -= 1
+        setTypewriterText(role.slice(0, charIndex))
+        if (charIndex === 0) {
+          deleting = false
+          clearInterval(interval)
+          setTypewriterIndex((current) => (current + 1) % typewriterRoles.length)
+          return
+        }
+      }
+    }
+
+    interval = window.setInterval(tick, 90)
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [typewriterIndex])
+
+  const handleTiltMove = (event, ref) => {
+    const node = ref.current
+    if (!node || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const rect = node.getBoundingClientRect()
+    const x = (event.clientX - rect.left) / rect.width
+    const y = (event.clientY - rect.top) / rect.height
+    const rotateX = (0.5 - y) * 12
+    const rotateY = (x - 0.5) * 12
+
+    node.style.setProperty('--tilt-x', `${rotateX}deg`)
+    node.style.setProperty('--tilt-y', `${rotateY}deg`)
+  }
+
+  const handleTiltLeave = (ref) => {
+    const node = ref.current
+    if (!node) return
+    node.style.setProperty('--tilt-x', '0deg')
+    node.style.setProperty('--tilt-y', '0deg')
+  }
+
+  useEffect(() => {
+    const glowNode = cursorGlowRef.current
+    if (!glowNode || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    let frameId = null
+    let targetX = window.innerWidth / 2
+    let targetY = window.innerHeight / 3
+    let currentX = targetX
+    let currentY = targetY
+
+    const handlePointerMove = (event) => {
+      targetX = event.clientX
+      targetY = event.clientY
+    }
+
+    const animateGlow = () => {
+      currentX += (targetX - currentX) * 0.08
+      currentY += (targetY - currentY) * 0.08
+      glowNode.style.transform = `translate3d(${currentX - 200}px, ${currentY - 200}px, 0)`
+      frameId = window.requestAnimationFrame(animateGlow)
+    }
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true })
+    frameId = window.requestAnimationFrame(animateGlow)
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove)
+      if (frameId !== null) window.cancelAnimationFrame(frameId)
+    }
+  }, [])
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme')
@@ -529,6 +670,11 @@ function App() {
 
   return (
     <div className="portfolio-bg relative min-h-screen overflow-hidden bg-gradient-to-b from-brand-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+      <div
+        ref={cursorGlowRef}
+        className="pointer-events-none fixed left-0 top-0 z-[1] hidden h-[400px] w-[400px] rounded-full bg-brand-500/10 blur-3xl dark:bg-cyan-400/10 md:block"
+        aria-hidden="true"
+      />
       <div className="fixed left-0 top-0 z-[60] h-1.5 w-full bg-slate-200/60 backdrop-blur dark:bg-slate-800/70">
         <div
           className="h-full bg-gradient-to-r from-cyan-500 via-brand-500 to-indigo-600 shadow-[0_0_18px_rgba(47,109,246,0.6)] transition-[width] duration-150"
@@ -677,7 +823,20 @@ function App() {
 
         <div className="grid gap-12 md:grid-cols-[1.3fr_1fr] md:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-500 dark:text-brand-100">Full Stack Developer</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-500 dark:text-brand-100">
+                <span className="typewriter-text">
+                  {typewriterText}
+                  <span className="typewriter-caret" aria-hidden="true" />
+                </span>
+              </p>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white shadow-lg shadow-orange-500/30">
+                <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+                  <path d="M13 2 3.5 13.5H11L9.5 22 20 10.5h-7.5L13 2Z" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                6+ Months Experience
+              </span>
+            </div>
             <RevealText
               as="h1"
               text="Hi, I am Aung Khant Min."
@@ -726,14 +885,29 @@ function App() {
               Scroll for more
             </div>
           </div>
-          <div className="hero-float rounded-3xl bg-white p-6 shadow-xl ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700">
+          <div
+            ref={heroCardRef}
+            className="tilt-card hero-float relative rounded-3xl bg-white p-6 shadow-xl ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700"
+            onMouseMove={(event) => handleTiltMove(event, heroCardRef)}
+            onMouseLeave={() => handleTiltLeave(heroCardRef)}
+          >
+            <span className="hero-glow absolute -inset-px -z-10 rounded-3xl opacity-60 blur-[2px]" aria-hidden="true" />
+            <span className="particle left-8 top-6 h-2 w-2" aria-hidden="true" />
+            <span className="particle right-10 top-16 h-1.5 w-1.5" style={{ animationDelay: '-3s' }} aria-hidden="true" />
+            <span className="particle bottom-16 left-12 h-2.5 w-2.5" style={{ animationDelay: '-6s' }} aria-hidden="true" />
+            <span className="particle right-8 bottom-8 h-1.5 w-1.5" style={{ animationDelay: '-1.5s' }} aria-hidden="true" />
             <img
               src="/images/profile.jpg"
               alt="Aung Khant Min profile"
               className="portrait-breathe h-80 w-full rounded-2xl object-cover object-[center_25%] ring-1 ring-slate-200 dark:ring-slate-700"
             />
             <p className="mt-4 text-lg font-bold text-slate-900 dark:text-white">Aung Khant Min</p>
-            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Full Stack Developer</p>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+              <span className="typewriter-text">
+                {typewriterText}
+                <span className="typewriter-caret" aria-hidden="true" />
+              </span>
+            </p>
             <ul className="mt-4 grid grid-cols-2 gap-2 text-sm text-slate-700 dark:text-slate-200">
               {coreStack.map(({ name, Icon, iconClass }) => (
                 <li key={name} className="inline-flex items-center gap-2 rounded-lg bg-slate-50 px-2.5 py-1.5 dark:bg-slate-800/70">
@@ -746,11 +920,27 @@ function App() {
         </div>
       </header>
 
+      <div className="relative z-10 border-y border-slate-200/80 bg-white/70 py-4 backdrop-blur dark:border-slate-700 dark:bg-slate-900/70">
+        <div className="marquee-mask overflow-hidden">
+          <div className="marquee-track flex w-max items-center gap-10 pr-10">
+            {[...marqueeItems, ...marqueeItems].map(({ name, Icon, iconClass }, index) => (
+              <span
+                key={`${name}-${index}`}
+                className="inline-flex shrink-0 items-center gap-2.5 rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-semibold text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              >
+                <Icon className={`text-xl ${iconClass}`} />
+                {name}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <main className="relative z-10 mx-auto max-w-5xl space-y-20 px-4 pb-20 sm:px-6">
         <section id="about">
           <SectionTitle eyebrow="About" title="A quick introduction" />
           <RevealText
-            text="I am a Full Stack Developer who enjoys turning ideas into polished, scalable web apps. I work with HTML, CSS, Tailwind CSS, JavaScript, React, PHP, Laravel, Kotlin, and MySQL to build smooth user experiences and reliable backend systems."
+            text="I am a Full Stack Developer with 6+ months of hands-on experience, turning ideas into polished, scalable web and mobile experiences. I work with HTML, CSS, Tailwind CSS, JavaScript, React, React Native, PHP, Laravel, WordPress, Kotlin, and databases like MySQL, MongoDB, and PostgreSQL to build smooth user experiences and reliable backend systems."
             className="max-w-3xl text-slate-700 dark:text-slate-300"
             step={12}
           />
